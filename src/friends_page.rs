@@ -55,6 +55,3 @@ impl Default for FriendsPage {
     }
 }
 
-impl FriendsPage {
-
-}

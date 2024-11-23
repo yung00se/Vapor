@@ -3,13 +3,15 @@
 use std::default;
 
 //use api::{ WordApi, MakeRequest};
-use eframe::egui::{Event, FontFamily, FontId, FontSelection, TextEdit};
+use eframe::egui::{Event, FontFamily, FontId, FontSelection, RichText, TextEdit};
 use eframe::{App, Frame};
 use eframe::egui::{self, CentralPanel, Label, Sense, Color32, Context, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
 use eframe::egui::epaint::{RectShape};
-use vapor::game_hub::{self, GameHub};
+use vapor::game_hub::GameHub;
 use vapor::friends_page::FriendsPage;
-use vapor::leaderboard_page::{self, LeaderboardPage};
+use vapor::leaderboard_page::LeaderboardPage;
+use vapor::login_page::LoginPage;
+use vapor::signup_page::SignupPage;
 use std::process::{Command};
 //use vapor::login_window::{LoginWindow};
 /*
@@ -23,6 +25,8 @@ use crate::game_state::UpdateGameVariables;
 use regex::Regex;
 */
 enum Page {
+    LoginPage(LoginPage),
+    SignupPage(SignupPage),
     GameHub(GameHub),
     FriendsPage(FriendsPage),
     LeaderboardPage(LeaderboardPage),
@@ -39,7 +43,7 @@ struct Vapor {
 impl Default for Vapor {
     fn default() -> Self {
         Self {
-            current_page: Page::GameHub(GameHub::default()),
+            current_page: Page::LoginPage(LoginPage::default()),
             page_index: 0,
             logged_in: false,
             username: String::from(""),
@@ -52,13 +56,69 @@ impl App for Vapor {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
         if !self.logged_in {
             CentralPanel::default().show(ctx, |ui| {
-                ui.label("Username:");
-                ui.add(TextEdit::singleline(&mut self.username));
-                ui.label("Password:");
-                ui.add(TextEdit::singleline(&mut self.password).password(true));
-    
-                if ui.input(|i| i.key_pressed(Key::Enter)) {
-                    self.submit_auth();
+                ui.horizontal(|ui| {
+                    if ui
+                        .add(Label::new("Login").sense(Sense::click()))
+                        .clicked()
+                        && self.page_index != 0 {
+                            self.current_page = Page::LoginPage(LoginPage::default());
+                            self.page_index = 0;
+                        }
+                    ui.add_space(75.0);
+                    if ui
+                        .add(Label::new("Signup").sense(Sense::click()))
+                        .clicked()
+                        && self.page_index != 1 {
+                            self.current_page = Page::SignupPage(SignupPage::default());
+                            self.page_index = 1;
+                        }
+                });
+            
+                match &mut self.current_page {
+                    Page::SignupPage(page) => {
+                        self.username = page.username.clone();
+                        self.password = page.password.clone();
+                        ui.heading("Signup");
+                        ui.label("Username:");
+                        ui.add(TextEdit::singleline(&mut page.username));
+                        ui.label("Password:");
+                        ui.add(TextEdit::singleline(&mut page.password).password(true));
+                        ui.label(RichText::new(page.error_msg.clone()).color(Color32::RED));
+            
+                        if ui.input(|i| i.key_pressed(Key::Enter)) {
+                            // if signup is successful
+                            if page.request_signup() {
+                                self.current_page = Page::GameHub(GameHub::default());
+                                self.logged_in = true;
+                            }
+                            else {
+                                println!("Failed sign up");
+                                page.error_msg = "The username and password do not match".into();
+                            }
+                        }
+                    }
+                    Page::LoginPage(page) => {
+                        self.username = page.username.clone();
+                        self.password = page.password.clone();
+                        ui.heading("Login");
+                        ui.label("Username:");
+                        ui.add(TextEdit::singleline(&mut page.username));
+                        ui.label("Password:");
+                        ui.add(TextEdit::singleline(&mut page.password).password(true));
+                        ui.label(RichText::new(page.error_msg.clone()).color(Color32::RED));
+            
+                        if ui.input(|i| i.key_pressed(Key::Enter)) {
+                            if page.request_login() {
+                                self.current_page = Page::GameHub(GameHub::default());
+                                self.logged_in = true;
+                            }
+                            else {
+                                println!("Failed sign up");
+                                page.error_msg = "The username and password do not match".into();
+                            }
+                        }
+                    }
+                    _ => ()
                 }
             });
         }
@@ -90,7 +150,6 @@ impl App for Vapor {
                             self.page_index = 2;
                         }
                 });
-
                 match &mut self.current_page {
                     Page::GameHub(page) => {
                         //println!("On Gamehub page");
@@ -147,13 +206,6 @@ impl App for Vapor {
                 }
             });
         }
-    }
-}
-
-
-impl Vapor {
-    fn submit_auth(&mut self) {
-        self.logged_in = true;
     }
 }
 

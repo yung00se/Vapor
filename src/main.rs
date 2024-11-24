@@ -1,5 +1,6 @@
 use eframe::{App, Frame};
 use eframe::egui;
+use vapor::pages::game_hub::DisplayLibrary;
 use vapor::user_info::User;
 use vapor::pages::navigator::NavBar;
                   
@@ -18,8 +19,7 @@ impl Default for Vapor{
 
 impl App for Vapor {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
-            if self.user.id == None { self.user.current_page = "land".to_string();}
-
+        if self.user.id == None { self.user.current_page = "land".to_string();}
         self.user.show_nav_bar(ctx);
         //Draw the current page
         self.user.show_current_page(ctx);

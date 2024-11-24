@@ -1,6 +1,6 @@
 use eframe::egui;
 use super::pages::{friends_page::DisplayFriends, login_page::DisplayLanding, leaderboard_page::DisplayLeaderboard, game_hub::DisplayLibrary, navigator::NavBar};
-use crate::pages::game_hub::GameIcon;
+use crate::pages::game_hub::{GameIcon, build_library};
 
 #[derive(Clone)]
 pub struct User {
@@ -35,16 +35,12 @@ impl User {
             name,
             password: "".into(),
             id: Some(000_i32),
-            library: None,
+            library: Some(build_library()),
             friends: None,
             leaderboard: None,
             current_page: "land".to_string(),
         }
     } 
-    
-    pub fn populate_library(&mut self){
-        
-    }
     
     pub fn populate_friends(&mut self){
         self.friends = Some([(User::new("Paul".into()), 420),

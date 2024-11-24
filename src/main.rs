@@ -1,6 +1,6 @@
 use eframe::egui::{Event, FontFamily, FontId, FontSelection, RichText, TextEdit};
 use eframe::{App, Frame};
-use eframe::egui::{self, CentralPanel, Label, Sense, Color32, Context, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
+use eframe::egui::{self, CentralPanel, Label, Sense, Color32, Grid, Context, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
 use eframe::egui::epaint::{RectShape};
 use vapor::game_hub::GameHub;
 use vapor::friends_page::FriendsPage;
@@ -167,38 +167,67 @@ impl App for Vapor {
                         }}// End Game Hub
 
                     Page::FriendsPage(page) => {
-                        for friend in page.friends.iter() {
-                            let (friend_rect, _response) = ui.allocate_exact_size(Vec2::new(200.0, 20.0), Sense::hover());
+                        //println!("On Friends page");
+                        //let line = ui.allocate_exact_size(Vec2::new(600.0, 2.0), Sense::hover());
+                        // for friend in page.friends.iter() {
+                        //     let (friend_rect, _response) = ui.allocate_exact_size(Vec2::new(200.0, 20.0), Sense::hover());
 
-                            ui.painter().rect_filled(
-                                friend_rect,
-                                0.0,
-                                Color32::from_rgb(248, 248, 248));
-                            
-                            ui.painter().text( friend_rect.center(),
-                                               egui::Align2::LEFT_CENTER,
-                                               friend.username.clone() + format!("\t\t\tHigh Score: {}", friend.highscore.to_string().as_str()).as_str(),
-                                               FontId::default(),
-                                               Color32::from_rgb(40, 40, 40));
-                        }}//FriendsPage
+                        //     ui.painter().rect_filled(friend_rect, 0.0, Color32::from_rgb(248, 248, 248));
+                        //     //println!("{}", friend.highscore);
+                        //     ui.painter().text(
+                        //         friend_rect.center(),
+                        //         egui::Align2::LEFT_CENTER,
+                        //         friend.username.clone() + format!("\t\t\tHigh Score: {}", friend.highscore.to_string().as_str()).as_str(),
+                        //         FontId::default(),
+                        //         Color32::from_rgb(40, 40, 40),
+                        //     );
+                        // }
+                        ui.heading("Friends List");
+                        ui.separator();
+                        Grid::new("friends_grid")
+                            .striped(true)
+                            .show(ui, |ui| {
+                                ui.heading("Username");
+                                ui.heading("High Score");
+                                ui.end_row();
 
+                                for friend in page.friends.iter() {
+                                    ui.label(&friend.username);
+                                    ui.label(format!("{}", friend.wu_highscore));
+                                    ui.end_row();
+                                }
+                            });
+                    }
                     Page::LeaderboardPage(page) => {
-                        for user in page.users.iter() {
-                            let (user_rect, _response) = ui.allocate_exact_size(Vec2::new(200.0, 15.0), Sense::hover());
+                        //println!("On Leaderboard page");
+                        // for user in page.users.iter() {
+                        //     let (user_rect, _response) = ui.allocate_exact_size(Vec2::new(200.0, 15.0), Sense::hover());
+                        //     ui.painter().rect_filled(user_rect, 0.0, Color32::from_rgb(248, 248, 248));
+                        //     ui.painter().text(
+                        //         user_rect.center(),
+                        //         egui::Align2::LEFT_CENTER,
+                        //         user.username.clone() + format!("\t\t\t\t\t\t\t\t\t\t\tHigh Score: {}", user.highscore.to_string().as_str()).as_str(),
+                        //         FontId::default(),
+                        //         Color32::from_rgb(40, 40, 40),
+                        //     );
+                        // }
+                        page.users.sort_by(|a, b| b.wu_highscore.cmp(&a.wu_highscore));
+                        ui.heading("Leaderboard");
+                        ui.separator();
+                        Grid::new("leaderboard_grid")
+                            .striped(true)
+                            .show(ui, |ui| {
+                                ui.heading("Username");
+                                ui.heading("High Score");
+                                ui.end_row();
 
-                            ui.painter().rect_filled(
-                                user_rect,
-                                0.0,
-                                Color32::from_rgb(248, 248, 248));
-
-                            ui.painter().text(
-                                user_rect.center(),
-                                egui::Align2::LEFT_CENTER,
-                                user.username.clone() + format!("\t\t\t\t\t\t\t\t\t\t\tHigh Score: {}", user.highscore.to_string().as_str()).as_str(),
-                                FontId::default(),
-                                Color32::from_rgb(40, 40, 40));
-                        }}//Leaderboard
-
+                                for user in page.users.iter() {
+                                    ui.label(&user.username);
+                                    ui.label(format!("{}", user.wu_highscore));
+                                    ui.end_row();
+                                }
+                            });
+                    }
                     _ => ()
                 }
             });

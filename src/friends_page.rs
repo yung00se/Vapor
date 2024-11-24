@@ -4,7 +4,7 @@ pub struct Friend {
     pub height: f32,
     pub width: f32,
     pub username: String,
-    pub highscore: u16,
+    pub wu_highscore: u16,
 }
 
 impl Default for Friend {
@@ -13,7 +13,7 @@ impl Default for Friend {
             height: 50.0,
             width: 100.0,
             username: String::from(""),
-            highscore: 0,
+            wu_highscore: 0,
         }
     }
 }
@@ -23,8 +23,8 @@ impl Friend {
         Self {
             height: 50.0,
             width: 100.0,
-            username,
-            highscore,
+            username: username,
+            wu_highscore: highscore,
         }
     }
 }

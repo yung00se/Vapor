@@ -8,7 +8,7 @@ pub struct User {
     pub height: f32,
     pub width: f32,
     pub username: String,
-    pub highscore: u16,
+    pub wu_highscore: u16,
 }
 
 impl Default for User {
@@ -17,18 +17,18 @@ impl Default for User {
             height: 50.0,
             width: 100.0,
             username: String::from(""),
-            highscore: 0,
+            wu_highscore: 0,
         }
     }
 }
 
 impl User {
-    fn new(username: String, highscore: u16) -> Self {
+    fn new(username: String, wu_highscore: u16) -> Self {
         Self {
             height: 50.0,
             width: 100.0,
             username: username,
-            highscore: highscore,
+            wu_highscore: wu_highscore,
         }
     } 
 }

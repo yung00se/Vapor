@@ -26,7 +26,9 @@ impl App for Vapor {
     }
 }
 
-fn main() {
+
+#[tokio::main]
+async fn main() {
     let native_options = eframe::NativeOptions::default();
 
     let _ = eframe::run_native( // Start Vapor

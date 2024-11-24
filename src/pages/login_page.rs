@@ -1,6 +1,6 @@
 use eframe::egui::{Label, RichText, Sense, TextEdit, TopBottomPanel};
 use eframe::egui::{self, CentralPanel, Color32, Key};
-
+use crate::data_base_api::data_base_api::DbAPI;
 use crate::user_info::User;
 
 pub trait DisplayLanding{
@@ -43,6 +43,12 @@ impl DisplayLanding for User{
 impl User {
     fn request_login(&mut self){
         // make signup request here
+        let db_api = DbAPI::new();
+        let user_logged_in = db_api.login_request(&self.name, &self.password);
+        println!("{}", user_logged_in);
+        if (user_logged_in) {
+            println!("Logged in");
+        }
         self.id = Some(420); //Example ID number
         //The implementation should:
         //Check if the user entered a valid username/password combo

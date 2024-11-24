@@ -1,80 +1,30 @@
-use eframe::egui::{Event, FontFamily, FontId, FontSelection, TextEdit};
-use eframe::{App, Frame};
-use eframe::egui::{self, CentralPanel, Label, Color32, Context, Sense, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
-use eframe::epaint::{RectShape};
+use eframe::egui::{self, Color32, Sense, Vec2, FontId};
+use crate::user_info::User;
 
-
-pub struct User {
-    pub height: f32,
-    pub width: f32,
-    pub username: String,
-    pub highscore: u16,
+pub trait DisplayLeaderboard{
+    fn display_leaderboard(&mut self, ctx: &egui::Context);
 }
 
-impl Default for User {
-    fn default() -> Self {
-        Self {
-            height: 50.0,
-            width: 100.0,
-            username: String::from(""),
-            highscore: 0,
-        }
-    }
-}
+impl DisplayLeaderboard for User {
+    fn display_leaderboard(&mut self, ctx: &egui::Context) {
+        if let Some(leaderboard) = &self.leaderboard.clone() {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                for user in leaderboard {
+                    let (user_rect, _response) = ui.allocate_exact_size(Vec2::new(200.0, 15.0), Sense::hover());
 
-impl User {
-    fn new(username: String, highscore: u16) -> Self {
-        Self {
-            height: 50.0,
-            width: 100.0,
-            username: username,
-            highscore: highscore,
-        }
-    } 
-}
+                    ui.painter().rect_filled(
+                        user_rect,
+                        0.0,
+                        Color32::from_rgb(248, 248, 248));
 
-pub struct LeaderboardPage {
-    pub page_name: String,
-    pub users: Vec<User>,
-}
-
-
-impl Default for LeaderboardPage {
-    fn default() -> Self {
-        let mut users = Vec::new();
-        users.push(User::new(String::from("xx_Slayer_1027789_xx"), 32));
-        users.push(User::new(String::from("urmomlol"), 112));
-        users.push(User::new(String::from("why_is_this_game_so_hard"), 0));
-        users.push(User::new(String::from("vapor_user_1404"), 49));
-        users.push(User::new(String::from("ben_dover"), 75));
-        users.push(User::new(String::from("hawk_tuah_yuh"), 69));
-        users.push(User::new(String::from("80085"), 88));
-        users.push(User::new(String::from("hacker_man_17"), 65535));
-        Self {
-            page_name: String::from("Leaderboard"),
-            users: users,
-        }
-    }
-}
-
-impl LeaderboardPage {
-   pub fn show_leaderboards(&self, ctx: &egui::Context) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            for user in self.users.iter() {
-                let (user_rect, _response) = ui.allocate_exact_size(Vec2::new(200.0, 15.0), Sense::hover());
-
-                ui.painter().rect_filled(
-                    user_rect,
-                    0.0,
-                    Color32::from_rgb(248, 248, 248));
-
-                ui.painter().text(
-                    user_rect.center(),
-                    egui::Align2::LEFT_CENTER,
-                    user.username.clone() + format!("\t\t\t\t\t\t\t\t\t\t\tHigh Score: {}", user.highscore.to_string().as_str()).as_str(),
-                    FontId::default(),
-                    Color32::from_rgb(40, 40, 40));
+                    ui.painter().text(
+                        user_rect.center(),
+                        egui::Align2::LEFT_CENTER,
+                        user.0.name.clone() + format!("\t\t\t\t\t\t\t\t\t\t\tHigh Score: {}", user.1.to_string().as_str()).as_str(),
+                        FontId::default(),
+                        Color32::from_rgb(40, 40, 40));
                 }
-        });
+            });
+        } else { &mut self.populate_leaderboard();}
     }
 }

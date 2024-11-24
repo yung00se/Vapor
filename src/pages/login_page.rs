@@ -1,43 +1,59 @@
-use eframe::egui::{Event, FontFamily, FontId, FontSelection, TextEdit, RichText};
-use eframe::{App, Frame};
-use eframe::egui::{self, CentralPanel, Label, Sense, Color32, Context, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
-use eframe::egui::epaint::{RectShape};
+use eframe::egui::{Label, RichText, Sense, TextEdit, TopBottomPanel};
+use eframe::egui::{self, CentralPanel, Color32, Key};
 
-pub struct LoginPage {
-    pub username: String,
-    pub password: String,
-    pub error_msg: String,
+use crate::user_info::User;
+
+pub trait DisplayLanding{
+    fn display_landing(&mut self, ctx: &egui::Context);
 }
 
-impl Default for LoginPage {
-    fn default() -> Self {
-        Self {
-            username: String::from(""),
-            password: String::from(""),
-            error_msg: String::from(""),
-        }
-    }
-}
+impl DisplayLanding for User{
+    fn display_landing(&mut self, ctx: &egui::Context){
+        let mut label_text = String::new();
+        TopBottomPanel::bottom("login-or-signup").show(ctx, |ui| {
+            ui.horizontal(|ui| { if ui
+                                 .add(Label::new("Login").sense(Sense::click()))
+                                 .clicked(){ label_text = "Login:".into() }
 
-impl App for LoginPage {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
+                                 ui.add_space(75.0);
+
+                                 if ui
+                                 .add(Label::new("Signup").sense(Sense::click()))
+                                 .clicked() { label_text = "Sign Up:".into()  } /*End Login/Signup Buttons*/ });
+        });
         CentralPanel::default().show(ctx, |ui| {
+            ui.heading(label_text.clone());
+            
             ui.label("Username:");
-            ui.add(TextEdit::singleline(&mut self.username));
+            ui.add(TextEdit::singleline(&mut self.name)); //Username Entry
+
             ui.label("Password:");
             ui.add(TextEdit::singleline(&mut self.password).password(true));
-            ui.label(RichText::new(self.error_msg.clone()).color(Color32::RED));
 
-            if ui.input(|i| i.key_pressed(Key::Enter)) {
-                self.request_login();
-            }
-        });
+            ui.label(RichText::new("Test").color(Color32::RED));
+
+            if ui.input(|i| i.key_pressed(Key::Enter)) { 
+                if label_text.clone() == "Login:" {self.request_login();}
+                else {self.request_signup();}
+            }});
     }
 }
-impl LoginPage {
-    pub fn request_login(&self) -> bool {
+
+
+impl User {
+    fn request_login(&mut self){
         // make signup request here
-        println!("Username: {}\nPassword: {}", self.username, self.password);
-        true
+        self.id = Some(420); //Example ID number
+        //The implementation should:
+        //Check if the user entered a valid username/password combo
+        //Assign the ID that corresponds with that account
+        self.current_page = "lib".to_string();
+    }
+
+    fn request_signup(&mut self){
+        //TODO//
+        self.id = Some(6969);
+        //Similar to request_login, but assign a new unique ID to their account instead
+        self.id = Some(82317);
     }
 }

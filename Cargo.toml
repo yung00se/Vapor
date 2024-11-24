@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 eframe = "0.29.1"
+walkdir = "2"
+as-any = "0.3.1"

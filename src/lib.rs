@@ -1,2 +1,2 @@
-pub mod game_hub;
 pub mod pages;
+pub mod user_info;

@@ -9,7 +9,6 @@ pub mod data_base_api{
     use tokio::{self, sync::Notify};
     use core::error;
     use std::default;
-
     pub trait MakeRequest {
         fn send_request(&self, input: &str) -> ReturnType;
         fn login(&self, username: &str) -> Option<User>;
@@ -36,20 +35,17 @@ pub mod data_base_api{
         pub notify: Arc<Notify>,
         pub friends: Arc<Mutex<Vec<User>>>,
         pub users: Arc<Mutex<Vec<User>>>,
-        //pub runtime: Runtime,
     }
 
 
     impl DbAPI {
 
         pub fn new() -> Self{
-            let runtime = Runtime::new().unwrap();
             let api = DbAPI {
                 client: Client::new(),
                 notify: Arc::new(Notify::new()),
                 friends: Arc::new(Mutex::new(Vec::new())),
                 users: {Arc::new(Mutex::new(Vec::new()))},
-                //runtime,
             };
             api.send_request("/api/User/GetAllUsers");
 

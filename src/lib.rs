@@ -1,6 +1,3 @@
-pub mod game_hub;
-pub mod friends_page;
-pub mod leaderboard_page;
-pub mod signup_page;
-pub mod login_page;
+pub mod pages;
+pub mod user_info;
 pub mod data_base_api;

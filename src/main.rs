@@ -1,6 +1,7 @@
 use eframe::egui::{Event, FontFamily, FontId, FontSelection, RichText, TextEdit};
 use eframe::{App, Frame};
-use eframe::egui::{self, CentralPanel, Label, Sense, Color32, Context, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
+use eframe::egui::{self, CentralPanel, Label, Sense, Color32, Grid, Context, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
+use eframe::egui::epaint::{RectShape};
 use vapor::game_hub::GameHub;
 use vapor::pages::{friends_page::FriendsPage, leaderboard_page::LeaderboardPage, login_page::LoginPage, signup_page::SignupPage};
 

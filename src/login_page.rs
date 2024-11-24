@@ -2,6 +2,7 @@ use eframe::egui::{Event, FontFamily, FontId, FontSelection, TextEdit, RichText}
 use eframe::{App, Frame};
 use eframe::egui::{self, CentralPanel, Label, Sense, Color32, Context, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
 use eframe::egui::epaint::{RectShape};
+use crate::data_base_api::data_base_api::DbAPI;
 
 pub struct LoginPage {
     pub username: String,
@@ -36,8 +37,9 @@ impl App for LoginPage {
 }
 impl LoginPage {
     pub fn request_login(&self) -> bool {
-        // make signup request here
-        println!("Username: {}\nPassword: {}", self.username, self.password);
+        let db_api = DbAPI::new();
+        //let result = db_api.login_request(&self.username, &self.password);
+        
         true
     }
 }

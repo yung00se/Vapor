@@ -209,7 +209,8 @@ impl App for Vapor {
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     //env::set_var("RUST_BACKTRACE", "1");
     let native_options = eframe::NativeOptions::default(); // Create default native options
     /* 

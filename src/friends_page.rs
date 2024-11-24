@@ -1,10 +1,5 @@
-use eframe::egui::{Event, FontFamily, FontId, FontSelection, TextEdit};
-use eframe::{App, Frame};
-use eframe::egui::{self, CentralPanel, Label, Color32, Context, Sense, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
-use eframe::epaint::{RectShape};
-use std::process::{Command, Output};
-
-
+//Friend//
+#[derive(Clone)]
 pub struct Friend {
     pub height: f32,
     pub width: f32,
@@ -28,29 +23,28 @@ impl Friend {
         Self {
             height: 50.0,
             width: 100.0,
-            username: username,
-            highscore: highscore,
+            username,
+            highscore,
         }
     }
 }
 
+//Friends Page//
 pub struct FriendsPage {
     pub page_name: String,
     pub friends: Vec<Friend>,
 }
 
-
 impl Default for FriendsPage {
     fn default() -> Self {
-        let mut friends = Vec::new();
-        friends.push(Friend::new(String::from("Paul"), 43));
-        friends.push(Friend::new(String::from("John"), 26));
-        friends.push(Friend::new(String::from("Will"), 39));
-        friends.push(Friend::new(String::from("Spencer"), 38));
-        friends.push(Friend::new(String::from("Mann"), 46));
         Self {
             page_name: String::from("Friends"),
-            friends: friends,
+            friends: [ Friend::new(String::from("Paul"), 43),
+                       Friend::new(String::from("John"), 26),
+                       Friend::new(String::from("Will"), 39),
+                       Friend::new(String::from("Spencer"), 38),
+                       Friend::new(String::from("Mann"), 46)
+                     ].to_vec()
         }
     }
 }

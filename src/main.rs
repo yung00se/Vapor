@@ -1,13 +1,12 @@
 use eframe::egui::{Event, FontFamily, FontId, FontSelection, RichText, TextEdit};
 use eframe::{App, Frame};
 use eframe::egui::{self, CentralPanel, Label, Sense, Color32, Context, text::Fonts, FontDefinitions, Key, Painter, Pos2, Rect, Rounding, Shape, SidePanel, Stroke, TopBottomPanel, Vec2};
-use eframe::egui::epaint::{RectShape};
 use vapor::game_hub::GameHub;
-use vapor::friends_page::FriendsPage;
-use vapor::leaderboard_page::LeaderboardPage;
-use vapor::login_page::LoginPage;
-use vapor::signup_page::SignupPage;
-use std::process::{Command};
+use vapor::pages::{friends_page::FriendsPage, leaderboard_page::LeaderboardPage, login_page::LoginPage, signup_page::SignupPage};
+
+
+
+
 //use vapor::login_window::{LoginWindow};
 /*
 use emath::Align2;
@@ -123,7 +122,7 @@ impl App for Vapor {
         } //End Authentication/Signup Pages//
 
         else {
-            CentralPanel::default().show(ctx, |ui| {
+            TopBottomPanel::top("page-directory").show(ctx, |ui| {
                 ui.horizontal(|ui| {
                     if ui
                         .add(Label::new("Games").sense(Sense::click()))
@@ -147,61 +146,19 @@ impl App for Vapor {
                         && self.page_index != 2 { self.current_page = Page::LeaderboardPage(LeaderboardPage::default());
                                                   self.page_index = 2 }
                 }); // End Page Directory
-
-                match &mut self.current_page {
-                    Page::GameHub(page) => {
-                        for game in page.games.iter() {
-                            //ui.painter().add(game.rect);
-                            //println!(game.rect)
-                            let (game_rect, response) = ui.allocate_exact_size(Vec2::new(200.0, 50.0), Sense::click());
-                            ui.painter().rect_filled(game_rect, 0.0, Color32::BLACK);
-                            ui.painter().text(
-                                game_rect.center(),
-                                egui::Align2::CENTER_CENTER,
-                                game.title.clone(),
-                                FontId::default(),
-                                Color32::WHITE);
-
-                            if response.clicked() { game.handle_click() }
-
-                        }}// End Game Hub
-
-                    Page::FriendsPage(page) => {
-                        for friend in page.friends.iter() {
-                            let (friend_rect, _response) = ui.allocate_exact_size(Vec2::new(200.0, 20.0), Sense::hover());
-
-                            ui.painter().rect_filled(
-                                friend_rect,
-                                0.0,
-                                Color32::from_rgb(248, 248, 248));
-                            
-                            ui.painter().text( friend_rect.center(),
-                                               egui::Align2::LEFT_CENTER,
-                                               friend.username.clone() + format!("\t\t\tHigh Score: {}", friend.highscore.to_string().as_str()).as_str(),
-                                               FontId::default(),
-                                               Color32::from_rgb(40, 40, 40));
-                        }}//FriendsPage
-
-                    Page::LeaderboardPage(page) => {
-                        for user in page.users.iter() {
-                            let (user_rect, _response) = ui.allocate_exact_size(Vec2::new(200.0, 15.0), Sense::hover());
-
-                            ui.painter().rect_filled(
-                                user_rect,
-                                0.0,
-                                Color32::from_rgb(248, 248, 248));
-
-                            ui.painter().text(
-                                user_rect.center(),
-                                egui::Align2::LEFT_CENTER,
-                                user.username.clone() + format!("\t\t\t\t\t\t\t\t\t\t\tHigh Score: {}", user.highscore.to_string().as_str()).as_str(),
-                                FontId::default(),
-                                Color32::from_rgb(40, 40, 40));
-                        }}//Leaderboard
-
-                    _ => ()
-                }
             });
+            match &self.current_page {
+                Page::FriendsPage(page) => {
+                    page.friend_page_home(ctx);
+                },
+                Page::LeaderboardPage(page) => {
+                    page.show_leaderboards(ctx);
+                },
+                Page::GameHub(page) => {
+                    page.show_game_hub(ctx);
+                },
+                _ => (),
+            }
         }
     }
 }

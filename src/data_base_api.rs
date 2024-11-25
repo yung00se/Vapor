@@ -1,6 +1,4 @@
 //use eframe::egui::mutex::Mutex;
-
-use serde_json::Value;
 use std::collections::HashMap;
 
 use std::f32::consts::E;
@@ -14,10 +12,13 @@ use tokio::{self, sync::Notify};
 use core::error;
 use std::default;
 use reqwest::Error;
+
 pub trait MakeRequest {
-    fn get(&self, input: &str);
-    fn post(&self, input: &str, payload: &str);
-    //fn login(&self, username: &str) -> ReturnType;
+    fn get_login(&self, username: &str);
+    fn get_friends_list(&self, user_id: &str);
+    fn get_leaderboard(&self);
+    fn get_user_stats(&self, user_id: &str);
+    fn post_signup(&self, username: &str, password: &str);
 }
 
 pub enum ReturnType{
@@ -35,11 +36,23 @@ pub struct User{
     pub HighScore: i32,
 }
 
+impl Default for User {
+    fn default() -> Self {
+        Self {
+            UserID: -1,
+            Username: "".to_string(),
+            Password: "".to_string(),
+            HighScore: 0,
+        }
+    }
+}
 
 pub struct DbAPI {
     pub client: Client,
     pub notify: Arc<Notify>,
-    pub users: Arc<Mutex<Vec<User>>>,
+    pub user: Arc<Mutex<Vec<User>>>,
+    pub friends_list: Arc<Mutex<Vec<String>>>,
+    pub leaderboard: Arc<Mutex<Vec<User>>>,
 }
 
 
@@ -49,20 +62,25 @@ impl DbAPI {
         Self {
             client: Client::new(),
             notify: Arc::new(Notify::new()),
-            users: {Arc::new(Mutex::new(Vec::new()))},
+            user: Arc::new(Mutex::new(Vec::new())),
+            friends_list: Arc::new(Mutex::new(Vec::new())),
+            leaderboard: Arc::new(Mutex::new(Vec::new())),
         }
     }
 }
 
 impl MakeRequest for DbAPI{
-    fn get(&self, input: &str) {
-        let url = format!("http://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/LookForUser?username={}", input);
-        let response_arc: Arc<Mutex<Vec<User>>> = Arc::clone(&self.users);
+    fn get_login(&self, username: &str) {
+        let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
+        let end = format!("/User/LookForUser?username={}", username);
+        let url = api_url + &end;
+        eprint!("{}", url);
+        let response_arc: Arc<Mutex<Vec<User>>> = Arc::clone(&self.user);
         tokio::spawn(async move{
-            let response = reqwest::get(&url).await;
+            let response = reqwest::get(url).await;
             match response {
                 Ok(resp) => {
-                    let response_body: Vec<User> = resp.json().await.expect("Error awaiting response");
+                    let response_body: Vec<User> = resp.json().await.expect("Error Logging in");
                     *response_arc.lock().unwrap() = response_body;
                 },
                 Err(e) => {
@@ -72,22 +90,72 @@ impl MakeRequest for DbAPI{
         });
     }
 
-    fn post(&self, input: &str, payload: &str) {
-        let url = format!("http://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/{}", input);
-        let response_arc: Arc<Mutex<Vec<User>>> = Arc::clone(&self.users);
-        // parse payload into JSON here
-        let contents = std::fs::read_to_string("test.json").expect("Failed to read from file");
-        let json_map: User = serde_json::from_str(contents.as_str()).expect("Error");
+    fn get_friends_list(&self, user_id: &str) {
+        let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
+        let end = format!("/Friend/GetAllFriends/{}", user_id);
+        let url = api_url + &end;
+        eprint!("{}", url);
+        // /Friend/GetAllFriends/{UserID}
+        let response_arc: Arc<Mutex<Vec<String>>> = Arc::clone(&self.friends_list);
+        tokio::spawn(async move{
+            let response = reqwest::get(url).await;
+            match response {
+                Ok(resp) => {
+                    let response_body: Vec<String> = resp.json().await.expect("Error getting friends list");
+                    *response_arc.lock().unwrap() = response_body;
+                },
+                Err(e) => {
+                    eprint!("{}", e);
+                }
+            }
+        });
+    }
+
+    fn get_leaderboard(&self) {
+        let url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/GetScoresDescending".to_string();
+        eprint!("{}", url);
+        let response_arc: Arc<Mutex<Vec<User>>> = Arc::clone(&self.leaderboard);
+        tokio::spawn(async move{
+            let response = reqwest::get(url).await;
+            match response {
+                Ok(resp) => {
+                    let response_body: Vec<User> = resp.json().await.expect("Error getting leaderboard");
+                    *response_arc.lock().unwrap() = response_body;
+                },
+                Err(e) => {
+                    eprint!("{}", e);
+                }
+            }
+        });
+    }
+
+    fn get_user_stats(&self, user_id: &str) {
+
+    }
+
+    fn post_signup(&self, username: &str, password: &str) { //username: &str, password: &str) {
+        let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
+        let end = format!("/User/AddUser?username={}&password={}", username, password);
+        let url = api_url + &end;
+        // User/AddUser?username=paul&password=firefire"
+        let response_arc: Arc<Mutex<Vec<User>>> = Arc::clone(&self.user);
         let client_clone = self.client.clone();
         tokio::spawn(async move{
-            let response = client_clone.post(&url).json(&json_map).send().await;
+            let response = client_clone.post(url).body("").send().await;
             match response {
                 Ok(resp) => {
                     let response_body: Vec<User> = resp.json().await.unwrap();
                     *response_arc.lock().unwrap() = response_body;
-                    println!("Sucessful post");
                 },
-                Err(e) => eprint!("{}", e)}          
+                Err(e) => {
+                    if e.status().unwrap() == 400 {
+                        eprint!("Username is taken\n");
+                    }
+                    else {
+                        eprint!("{}", e);
+                    }
+                }
+            }
         });
     }
 }

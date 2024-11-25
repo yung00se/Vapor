@@ -33,7 +33,7 @@ impl App for Vapor {
             }
             None => {
                 self.display_landing(ctx);
-                if let Some(user_info) = self.db_api.users.lock().unwrap().pop() {
+                if let Some(user_info) = self.db_api.user.lock().unwrap().pop() {
                     self.user.id = Some(user_info.UserID);
                 }
             }
@@ -81,13 +81,14 @@ impl DisplayLanding for Vapor {
 impl Vapor {
     fn request_login(&mut self){
         // make signup request here
-        //let url = 
-        self.db_api.get(&self.user.name);
+        //let url = format!("https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/LookForUser?username={}", self.user.name);
+        self.db_api.get_login(self.user.name.as_str());
     }
 
 
     fn request_signup(&mut self){
-        //self.db_api.post();
+        //let url = format!("https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/AddUser?username={}&password={}", self.user.name, self.user.password);
+        self.db_api.post_signup(self.user.name.as_str(), self.user.password.as_str());
     }
 }
 

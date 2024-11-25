@@ -32,7 +32,6 @@ impl App for Vapor {
                 if let Some(user_info) = self.db_api.users.lock().unwrap().pop() {
                     self.user.id = Some(user_info.UserID);
                 }
-                eprint!("im here");
             }
         }
         // Draw current page

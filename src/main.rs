@@ -3,6 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use eframe::{App, Frame};
 use eframe::egui::{self, Color32, Rect};
+use vapor::data_base_api::DbAPI;
 use vapor::user_info::User;
 use vapor::pages::navigator::NavBar;
                   
@@ -14,8 +15,22 @@ struct Vapor {
 }
 
 impl App for Vapor {
+
     fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
-        if self.user.id == None { self.user.current_page = "land".to_string();}
+        if self.user.id == None { 
+            self.user.current_page = "land".to_string();
+            match self.user.id {
+                Some(_id) => {
+                    self.user.show_nav_bar(ctx);
+                }
+                None => {
+                    self.display_landing(ctx);
+                    if let Some(user_info) = self.db_api.users.lock().unwrap().pop() {
+                        self.user.id = Some(user_info.UserID);
+                    }
+                }
+            }
+        }
         self.user.show_nav_bar(ctx);
         //Draw the current page
         self.user.show_current_page(ctx);

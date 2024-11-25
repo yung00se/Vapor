@@ -1,11 +1,7 @@
 use eframe::egui;
-<<<<<<< Updated upstream
-use super::pages::{friends_page::DisplayFriends, login_page::DisplayLanding, leaderboard_page::DisplayLeaderboard, game_hub::DisplayLibrary, navigator::NavBar};
-use crate::pages::game_hub::{GameIcon, build_library};
-=======
 use super::pages::{friends_page::DisplayFriends, leaderboard_page::DisplayLeaderboard, game_hub::DisplayLibrary, navigator::NavBar};
-use crate::{data_base_api::DbAPI, pages::game_hub::GameIcon};
->>>>>>> Stashed changes
+use crate::{data_base_api::DbAPI, pages::game_hub::{GameIcon, build_library}};
+
 
 #[derive(Clone)]
 pub struct User {

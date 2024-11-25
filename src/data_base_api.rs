@@ -16,7 +16,7 @@ use std::default;
 use reqwest::Error;
 pub trait MakeRequest {
     fn get(&self, input: &str);
-    fn post(&self, input: &str, payload: &str);
+    fn post(&self, username: &str, password: &str);
     //fn login(&self, username: &str) -> ReturnType;
 }
 
@@ -51,31 +51,7 @@ impl DbAPI {
             notify: Arc::new(Notify::new()),
             users: {Arc::new(Mutex::new(Vec::new()))},
         }
-        //api.send_request("/api/User/GetAllUsers");
-
-        //api
     }
-    /*
-    
-    pub fn login_request(&self, username: &str, password: &str) -> bool {
-        let got_response: Option<bool> = None;
-        
-        while !Some(got_response) {
-
-        }
-        let user = self.login(username);
-        match user {
-            Some(u) => {
-                if u.Password != password {
-                    false
-                }
-                else {
-                    true
-                }
-            },
-            None => false,
-        }
-    */
 }
 
 impl MakeRequest for DbAPI{
@@ -97,20 +73,18 @@ impl MakeRequest for DbAPI{
         //ReturnType::Error(None)
     }
 
-    fn post(&self, input: &str, payload: &str) {
-        let url = format!("http://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/{}", input);
+    fn post(&self, username: &str, password: &str) {
+        let url = format!("https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/AddUser?username={}&password={}", username, password);
         let response_arc: Arc<Mutex<Vec<User>>> = Arc::clone(&self.users);
         // parse payload into JSON here
-        let contents = std::fs::read_to_string("test.json").expect("Failed to read from file");
-        let json_map: User = serde_json::from_str(contents.as_str()).expect("Error");
+        //let json_map: User = serde_json::from_str(contents.as_str()).expect("Error");
         let client_clone = self.client.clone();
         tokio::spawn(async move{
-            let response = client_clone.post(&url).json(&json_map).send().await;
+            let response = client_clone.post(&url).body("").send().await;
             match response {
                 Ok(resp) => {
                     let response_body: Vec<User> = resp.json().await.unwrap();
                     *response_arc.lock().unwrap() = response_body;
-                    println!("Sucessful post");
                 },
                 Err(e) => eprint!("{}", e)}          
         });

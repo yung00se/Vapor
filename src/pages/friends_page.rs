@@ -1,4 +1,4 @@
-use eframe::egui::{self, Color32, FontId, Sense};
+use eframe::egui::{self, Color32, FontId, Pos2, Rect, Response, Sense};
 use eframe::emath::Vec2;
 use crate::user_info::User;
 
@@ -33,8 +33,15 @@ impl DisplayFriends for User{
         if let Some(friends_list) = &self.friends{
             egui::CentralPanel::default().show(ctx, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
-                    for (friend, _) in friends_list.iter() {
-                        ui.painter().rect_filled(ui.available_size.x, 25.0)
+                    for (friend, _response) in friends_list.iter() {
+                        let mut mini_friend_rect = Rect::ZERO;
+                        mini_friend_rect.set_width(ui.available_size().x);
+                        mini_friend_rect.set_height(25.0);
+                        
+                        ui.painter().rect_filled(
+                            mini_friend_rect,
+                            2.0,
+                            Color32::DARK_BLUE);
                     };
                 });                                                  
             });

@@ -1,7 +1,8 @@
 use eframe::{egui::{self, Color32, FontId, Pos2, Rect, Rounding, Sense, Shape, Stroke, Vec2},
              epaint::RectShape};
 use walkdir::WalkDir;
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::io::{Read, Write, BufRead, BufReader};
 
 use crate::user_info::User;
 
@@ -39,9 +40,19 @@ impl GameIcon{
 
 impl GameIcon {
     pub fn run_game(&self) {
-        Command::new(&self.path)
+       let mut game_instance = 
+            Command::new(&self.path)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
             .spawn()
             .expect("Game not found in Vapor Path...");
+
+        if let Some(game_output) = &mut game_instance.stdout {
+            let lines = BufReader::new(game_output).lines().enumerate().take(64);
+            for line in lines {
+                println!("Word Scrambler: {:?}", line);
+            }
+        }
     }
 }
 

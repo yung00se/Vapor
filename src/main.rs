@@ -83,12 +83,17 @@ impl DisplayLanding for Vapor {
 impl Vapor {
     fn request_login(&mut self){
         // make signup request here
-        self.db_api.get(&self.user.name);
+        let url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/LookForUser?username=".to_string()
+            + &self.user.name.to_string();
+        self.db_api.get(url);
     }
 
 
     fn request_signup(&mut self){
-        self.db_api.post(&self.user.name, &self.user.password);
+        let mut url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/AddUser?".to_string();
+        let end = format!("username={}&password={}", self.user.name, self.user.password);
+        url = url + &end;
+        self.db_api.post(url);
     }
 }
 

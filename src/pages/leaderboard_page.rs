@@ -5,6 +5,10 @@ pub trait DisplayLeaderboard{
     fn display_leaderboard(&mut self, ctx: &egui::Context);
 }
 
+pub trait GetLeaderboard {
+    fn get_leaderboard(self);
+}
+
 impl DisplayLeaderboard for User {
     fn display_leaderboard(&mut self, ctx: &egui::Context) {
         if let Some(leaderboard) = &self.leaderboard.clone() {

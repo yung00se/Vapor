@@ -15,8 +15,8 @@ use core::error;
 use std::default;
 use reqwest::Error;
 pub trait MakeRequest {
-    fn get(&self, input: &str);
-    fn post(&self, username: &str, password: &str);
+    fn get(&self, input: String);
+    fn post(&self, url: String); //username: &str, password: &str);
     //fn login(&self, username: &str) -> ReturnType;
 }
 
@@ -55,13 +55,16 @@ impl DbAPI {
 }
 
 impl MakeRequest for DbAPI{
-    fn get(&self, input: &str) {
-        let url = format!("http://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/LookForUser?username={}", input);
+    fn get(&self, url: String) {
+        let url = url;
+        //let url = format!("http://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/LookForUser?username={}", input);
         let response_arc: Arc<Mutex<Vec<User>>> = Arc::clone(&self.users);
         tokio::spawn(async move{
-            let response = reqwest::get(&url).await;
+            let response = reqwest::get(url).await;
             match response {
                 Ok(resp) => {
+                    //let response_body: String = resp.text().await.expect("Failed to get response");
+                    //eprint!("{}", response_body);
                     let response_body: Vec<User> = resp.json().await.expect("Error awaiting response");
                     *response_arc.lock().unwrap() = response_body;
                 },
@@ -70,11 +73,11 @@ impl MakeRequest for DbAPI{
                 }
             }
         });
-        //ReturnType::Error(None)
     }
 
-    fn post(&self, username: &str, password: &str) {
-        let url = format!("https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/AddUser?username={}&password={}", username, password);
+    fn post(&self, url: String) { //username: &str, password: &str) {
+        let url = url;
+        //let url = format!("https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/AddUser?username={}&password={}", username, password);
         let response_arc: Arc<Mutex<Vec<User>>> = Arc::clone(&self.users);
         // parse payload into JSON here
         //let json_map: User = serde_json::from_str(contents.as_str()).expect("Error");
@@ -86,26 +89,15 @@ impl MakeRequest for DbAPI{
                     let response_body: Vec<User> = resp.json().await.unwrap();
                     *response_arc.lock().unwrap() = response_body;
                 },
-                Err(e) => eprint!("{}", e)}          
-        });
-        //ReturnType::Error(None)
-    }
-
-    /*
-    fn login (&self, username: &str) -> ReturnType {
-        let url = format!("http://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/LookForUser?username={}", username);
-        let user: Result<User, reqwest::Error>;
-        tokio::spawn(async move {
-            let response = reqwest::get(&url).await;
-            match response {
-                Ok(resp) => {
-                    let user: User = resp.json().await.unwrap();
-                    ReturnType::CurrentUser(user)
-                },
-                Err(e) => ReturnType::Error(Some(e.to_string()))
-                _ => ReturnType::Error(None)
+                Err(e) => {
+                    if e.status().unwrap() == 400 {
+                        eprint!("Username is taken\n");
+                    }
+                    else {
+                        eprint!("{}", e);
+                    }
+                }
             }
         });
     }
-    */
 }

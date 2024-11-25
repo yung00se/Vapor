@@ -43,7 +43,7 @@ impl App for Vapor {
 impl Vapor {
     pub fn request_login(&mut self){
         // make signup request here
-        self.db_api.get(&self.user.name);
+        //self.db_api.get(&self.user.name);
         match self.user.id {
             Some(id) => {
                 eprint!("User {} Logged in", id);

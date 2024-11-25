@@ -1,6 +1,6 @@
 use eframe::egui;
-use super::pages::{friends_page::DisplayFriends, login_page::DisplayLanding, leaderboard_page::DisplayLeaderboard, game_hub::DisplayLibrary, navigator::NavBar};
-use crate::pages::game_hub::GameIcon;
+use super::pages::{friends_page::DisplayFriends, leaderboard_page::DisplayLeaderboard, game_hub::{DisplayLibrary, build_library}, navigator::NavBar};
+use crate::{data_base_api::DbAPI, pages::game_hub::GameIcon};
 
 #[derive(Clone)]
 pub struct User {
@@ -27,24 +27,18 @@ impl Default for User{
     }
 }
 
-
-
 impl User {
     pub fn new(name: String) -> Self {
         Self {
             name,
             password: "".into(),
             id: Some(000_i32),
-            library: None,
+            library: Some(build_library()),
             friends: None,
             leaderboard: None,
             current_page: "land".to_string(),
         }
     } 
-    
-    pub fn populate_library(&mut self){
-        
-    }
     
     pub fn populate_friends(&mut self){
         self.friends = Some([(User::new("Paul".into()), 420),
@@ -69,6 +63,5 @@ impl User {
         if self.current_page == "lib" {self.display_library(ctx)}
         else if self.current_page == "friends" {self.display_friends(ctx)}
         else if self.current_page == "leaderboards" {self.display_leaderboard(ctx)}
-        else {self.display_landing(ctx)}
     }
 }

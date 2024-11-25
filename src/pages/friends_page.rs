@@ -28,5 +28,3 @@ impl DisplayFriends for User{
         } else { &mut self.populate_friends(); }
     }
 }
-
-

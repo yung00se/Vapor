@@ -1,6 +1,6 @@
 use eframe::{egui::{self, Color32, FontId, Pos2, Rect, Rounding, Sense, Shape, Stroke, Vec2},
              epaint::RectShape};
-
+use walkdir::WalkDir;
 use std::process::Command;
 
 use crate::user_info::User;
@@ -22,7 +22,7 @@ impl Default for GameIcon {
 }
 
 impl GameIcon{
-    fn generate_icon(&mut self){
+    fn generate_icon_rect(&mut self){
         let index = self.id as f32;
         let top_left = Pos2::from(     ((100.0 * index) +  5.0   ,  5.0));
         let bottom_right = Pos2::from( ((100.0 * index) +  105.0 , 55.0));
@@ -31,9 +31,9 @@ impl GameIcon{
             Rect::from([top_left ,bottom_right]), 
             Rounding::ZERO, 
             Color32::BLACK, 
-        Stroke::new(
-            1.0,
-            Color32::BLACK)))
+            Stroke::new(
+                1.0,
+                Color32::BLACK)))
     }
 }
 
@@ -65,9 +65,30 @@ impl DisplayLibrary for User{
                     );
                     if response.clicked() { game.run_game() }}
             });
-        } else { &mut self.populate_library(); }
+        } else {  self.library = Some(build_library()) }
     }
-
-    
 }
+
+pub fn build_library() -> Vec<GameIcon>{   
+    let mut games: Vec<GameIcon> = Vec::new();
+    /* 
+    for result in WalkDir::new("/home/PDykes/Vapor").min_depth(1).max_depth(3){
+        let entry = result.expect("No File...");
+        let filename = entry.file_name().to_str().expect("Error converting game file-name from osStr => &str");
+        let path = entry.path().to_str().expect("Error unwrapping path");
+        
+        let mut icon = GameIcon{
+            title: filename.into(),
+            id: games.len() as i16,
+            rect: Shape::Noop,
+            path: path.into()};
+        icon.generate_icon_rect();
+        eprint!("{:?}", icon.id);
+        games.push(icon);
+        eprint!("Icon for: {} created...", filename)
+    };
+    */
+    games
+}
+
 

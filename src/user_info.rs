@@ -1,6 +1,11 @@
 use eframe::egui;
+<<<<<<< Updated upstream
 use super::pages::{friends_page::DisplayFriends, login_page::DisplayLanding, leaderboard_page::DisplayLeaderboard, game_hub::DisplayLibrary, navigator::NavBar};
 use crate::pages::game_hub::{GameIcon, build_library};
+=======
+use super::pages::{friends_page::DisplayFriends, leaderboard_page::DisplayLeaderboard, game_hub::DisplayLibrary, navigator::NavBar};
+use crate::{data_base_api::DbAPI, pages::game_hub::GameIcon};
+>>>>>>> Stashed changes
 
 #[derive(Clone)]
 pub struct User {
@@ -65,6 +70,5 @@ impl User {
         if self.current_page == "lib" {self.display_library(ctx)}
         else if self.current_page == "friends" {self.display_friends(ctx)}
         else if self.current_page == "leaderboards" {self.display_leaderboard(ctx)}
-        else {self.display_landing(ctx)}
     }
 }

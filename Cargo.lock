@@ -2801,6 +2801,20 @@ version = "0.1.0"
 dependencies = [
  "as-any",
  "eframe",
+<<<<<<< Updated upstream
+=======
+ "egui 0.15.0",
+ "emath 0.29.1",
+ "poll-promise",
+ "queues",
+ "rand",
+ "regex",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "ureq",
+>>>>>>> Stashed changes
  "walkdir",
 ]
 

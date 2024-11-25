@@ -1,32 +1,129 @@
 use eframe::{App, Frame};
 use eframe::egui;
+<<<<<<< Updated upstream
 use vapor::pages::game_hub::DisplayLibrary;
+=======
+use vapor::data_base_api::{DbAPI, MakeRequest};
+>>>>>>> Stashed changes
 use vapor::user_info::User;
 use vapor::pages::navigator::NavBar;
-                  
-
-struct Vapor {
+//use vapor::pages::login_page::DisplayLanding;
+use eframe::egui::{Label, RichText, Sense, TextEdit};
+use eframe::egui::{TopBottomPanel, CentralPanel, Color32, Key};
+               
+pub struct Vapor {
     user: User,
+    db_api: DbAPI,
 }
 
 impl Default for Vapor{
     fn default() -> Self{
         Self{
             user: User::default(),
+            db_api: DbAPI::new(),
         }
     }
 }
 
 impl App for Vapor {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut Frame) {
+<<<<<<< Updated upstream
         if self.user.id == None { self.user.current_page = "land".to_string();}
         self.user.show_nav_bar(ctx);
         //Draw the current page
+=======
+        match self.user.id {
+            Some(id) => {
+                eprint!("User has id {}", id);
+                self.user.show_nav_bar(ctx);
+            }
+            None => {
+                self.display_landing(ctx);
+                if let Some(user_info) = self.db_api.users.lock().unwrap().pop() {
+                    self.user.id = Some(user_info.UserID);
+                }
+            }
+        }
+        // Draw current page
+>>>>>>> Stashed changes
         self.user.show_current_page(ctx);
     }
 }
 
+<<<<<<< Updated upstream
 fn main() {
+=======
+pub trait DisplayLanding{
+    fn display_landing(&mut self, ctx: &egui::Context);
+}
+
+impl DisplayLanding for Vapor {
+    fn display_landing(&mut self, ctx: &egui::Context){
+        let mut label_text = "Login:".to_string();
+        TopBottomPanel::bottom("login-or-signup").show(ctx, |ui| {
+            ui.horizontal(|ui| { if ui
+                                 .add(Label::new("Login").sense(Sense::click()))
+                                 .clicked(){ label_text = "Login:".into() }
+
+                                 ui.add_space(75.0);
+
+                                 if ui
+                                 .add(Label::new("Signup").sense(Sense::click()))
+                                 .clicked() { label_text = "Sign Up:".into()  } /*End Login/Signup Buttons*/ });
+        });
+        CentralPanel::default().show(ctx, |ui| {
+            eprint!("{}", label_text);
+            ui.heading(label_text.clone());
+            
+            ui.label("Username:");
+            ui.add(TextEdit::singleline(&mut self.user.name)); //Username Entry
+
+            ui.label("Password:");
+            ui.add(TextEdit::singleline(&mut self.user.password).password(true));
+
+            ui.label(RichText::new("Test").color(Color32::RED));
+
+            if ui.input(|i| i.key_pressed(Key::Enter)) { 
+                if label_text.clone() == "Login:" {self.request_login();}
+                else {self.request_signup();}
+            }});
+    }
+}
+
+impl Vapor {
+    fn request_login(&mut self){
+        // make signup request here
+        self.db_api.get(&self.user.name);
+/*
+        match self.user.id {
+            Some(id) => {
+                eprint!("User {} Logged in", id);
+            }
+            None => {
+                eprint!("failed log in");
+            }
+        }
+        self.user.id = Some(420); //Example ID number
+        //The implementation should:
+        //Check if the user entered a valid username/password combo
+        //Assign the ID that corresponds with that account
+        self.user.current_page = "lib".to_string();
+*/
+        }
+
+
+    fn request_signup(&mut self){
+        self.db_api.post();
+        //TODO//
+        //self.user.id = Some(6969);
+        //Similar to request_login, but assign a new unique ID to their account instead
+        //self.user.id = Some(82317);
+    }
+}
+
+#[tokio::main]
+async fn main() {
+>>>>>>> Stashed changes
     let native_options = eframe::NativeOptions::default();
 
     let _ = eframe::run_native( // Start Vapor

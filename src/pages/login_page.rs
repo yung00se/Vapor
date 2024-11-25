@@ -1,15 +1,21 @@
 use eframe::egui::{Label, RichText, Sense, TextEdit, TopBottomPanel};
 use eframe::egui::{self, CentralPanel, Color32, Key};
+<<<<<<< Updated upstream
 
+=======
+use crate::data_base_api::{DbAPI, MakeRequest};
+>>>>>>> Stashed changes
 use crate::user_info::User;
+use crate::vapor::Vapor;
 
+/* 
 pub trait DisplayLanding{
     fn display_landing(&mut self, ctx: &egui::Context);
 }
 
-impl DisplayLanding for User{
+impl DisplayLanding for Vapor {
     fn display_landing(&mut self, ctx: &egui::Context){
-        let mut label_text = String::new();
+        let mut label_text = "Login:".to_string();
         TopBottomPanel::bottom("login-or-signup").show(ctx, |ui| {
             ui.horizontal(|ui| { if ui
                                  .add(Label::new("Login").sense(Sense::click()))
@@ -25,10 +31,10 @@ impl DisplayLanding for User{
             ui.heading(label_text.clone());
             
             ui.label("Username:");
-            ui.add(TextEdit::singleline(&mut self.name)); //Username Entry
+            ui.add(TextEdit::singleline(&mut self.user.name)); //Username Entry
 
             ui.label("Password:");
-            ui.add(TextEdit::singleline(&mut self.password).password(true));
+            ui.add(TextEdit::singleline(&mut self.user.password).password(true));
 
             ui.label(RichText::new("Test").color(Color32::RED));
 
@@ -39,10 +45,21 @@ impl DisplayLanding for User{
     }
 }
 
-
-impl User {
+impl Vapor {
     fn request_login(&mut self){
         // make signup request here
+<<<<<<< Updated upstream
+=======
+        self.db_api.get(&self.user.name);
+        match self.id {
+            Some(id) => {
+                eprint!("User {} Logged in", id);
+            }
+            None => {
+                eprint!("failed log in");
+            }
+        }
+>>>>>>> Stashed changes
         self.id = Some(420); //Example ID number
         //The implementation should:
         //Check if the user entered a valid username/password combo
@@ -57,3 +74,4 @@ impl User {
         self.id = Some(82317);
     }
 }
+    */

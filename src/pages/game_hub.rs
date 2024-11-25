@@ -82,7 +82,7 @@ impl DisplayLibrary for User{
 
 pub fn build_library() -> Vec<GameIcon>{   
     let mut games: Vec<GameIcon> = Vec::new();
-    for result in WalkDir::new("/home/PDykes/Vapor").min_depth(1).max_depth(3){
+    for result in WalkDir::new("../../Library").min_depth(1).max_depth(3){
         let entry = result.expect("No File...");
         let filename = entry.file_name().to_str().expect("Error converting game file-name from osStr => &str");
         let path = entry.path().to_str().expect("Error unwrapping path");

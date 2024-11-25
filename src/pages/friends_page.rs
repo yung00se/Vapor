@@ -4,6 +4,7 @@ use crate::user_info::User;
 
 pub trait DisplayFriends{
     fn display_friends(&mut self, ctx: &egui::Context);
+    fn display_friends_chat(&mut self, ctx: &egui::Context);
 }
 
 impl DisplayFriends for User{
@@ -26,6 +27,18 @@ impl DisplayFriends for User{
             });
             
         } else { &mut self.populate_friends(); }
+    }
+
+    fn display_friends_chat(&mut self, ctx: &egui::Context){
+        if let Some(friends_list) = &self.friends{
+            egui::CentralPanel::default().show(ctx, |ui| {
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    for (friend, _) in friends_list.iter() {
+                        ui.painter().rect_filled(ui.available_size.x, 25.0)
+                    };
+                });                                                  
+            });
+        }
     }
 }
 

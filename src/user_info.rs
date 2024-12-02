@@ -1,16 +1,17 @@
 use eframe::egui;
 use super::pages::{friends_page::DisplayFriends, leaderboard_page::DisplayLeaderboard, game_hub::{DisplayLibrary, build_library}, navigator::NavBar};
-use crate::{data_base_api::DbAPI, pages::game_hub::GameIcon};
+use crate::{data_base_api::{DbAPI, UserEntry}, pages::game_hub::GameIcon};
 
-#[derive(Clone)]
+//#[derive(Clone)]
 pub struct User {
     pub name: String,
     pub password: String,
-    pub id: Option<i32>,
-    pub library: Option<Vec<GameIcon>>,
-    pub friends: Option<Vec<(User, i32)>>,
-    pub leaderboard: Option<Vec<(User, i32)>>,
+    pub id: i32,
+    pub library: Vec<GameIcon>,
+    pub friends: Vec<UserEntry>,
+    pub leaderboard: Vec<UserEntry>,
     pub current_page: String,
+    pub got_response: bool,
 }
 
 impl Default for User{
@@ -18,46 +19,52 @@ impl Default for User{
         Self {
             name: "".into(),
             password: "".into(),
-            id: None,
-            library: None,
-            friends: None,
-            leaderboard: None,
+            id: -1,
+            library: Vec::new(),
+            friends: Vec::new(),
+            leaderboard: Vec::new(),
             current_page: "land".to_string(),
+            got_response: false,
         }
     }
 }
 
 impl User {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, password: String, id: i32) -> Self {
         Self {
             name,
-            password: "".into(),
-            id: Some(000_i32),
-            library: Some(build_library()),
-            friends: None,
-            leaderboard: None,
+            password,
+            id,
+            library: build_library(),
+            friends: Vec::new(),
+            leaderboard: Vec::new(),
             current_page: "land".to_string(),
+            got_response: false,
         }
     } 
     
+    /*
     pub fn populate_friends(&mut self){
-        self.friends = Some([(User::new("Paul".into()), 420),
-                             (User::new("John".into()), 111111),
-                             (User::new("Will".into()), 1234),
-                             (User::new("Spencer".into()), 909),
-                             (User::new("Mann".into()), 100000)].to_vec())
+        self.friends = Some([UserEntry::new(1,"Paul".into(), "pass123".into(), 420),
+                             UserEntry::new(2,"John".into(), "pass123".into(), 111111),
+                             UserEntry::new(3, "Will".into(), "pass123".into(), 1234),
+                             UserEntry::new(4, "Spencer".into(), "pass123".into(), 909),
+                             UserEntry::new(5, "Mann".into(), "pass123".into(), 100000)].to_vec())
     }
     
     pub fn populate_leaderboard(&mut self){
-        self.leaderboard = Some([(User::new(String::from("xx_Slayer_1027789_xx")), 32),
-                                (User::new(String::from("urmomlol")), 69),
-                                (User::new(String::from("why_is_this_game_so_hard")), 0),
-                                (User::new(String::from("vapor_user_1404")), 1337),
-                                (User::new(String::from("ben_dover")), 80085),
-                                (User::new(String::from("hawk_tuah_yuh")), 303),
-                                (User::new(String::from("80085")), 43110),
-                                (User::new(String::from("hacker_man_17")), 1010101)].to_vec());
+        self.leaderboard = Some([
+                UserEntry::new(1, "xx_Slayer_1027789_xx".into(), "pass123".into(), 32),
+                UserEntry::new(1, "urmomlol".into(), "pass123".into(), 69),
+                UserEntry::new(1, "why_is_this_game_so_hard".into(), "pass123".into(), 0),
+                UserEntry::new(1, "vapor_user_1404".into(), "pass123".into(), 1337),
+                UserEntry::new(1, "ben_dover".into(), "pass123".into(), 80085),
+                UserEntry::new(1, "hawk_tuah_yuh".into(), "pass123".into(), 303),
+                UserEntry::new(1, "80085".into(), "pass123".into(), 43110),
+                UserEntry::new(1, "hacker_man_17".into(), "pass123".into(), 1010101),
+        ].to_vec());
     }
+    */
 
     pub fn show_current_page(&mut self, ctx: &egui::Context){
         if self.current_page == "lib" {self.display_library(ctx)}

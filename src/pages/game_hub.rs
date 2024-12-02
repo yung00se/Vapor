@@ -3,7 +3,8 @@ use eframe::{egui::{self, Color32, FontId, Pos2, Rect, Rounding, Sense, Shape, S
 use walkdir::WalkDir;
 use std::process::Command;
 
-use crate::user_info::User;
+//use crate::user_info::User;
+use crate::vapor::Vapor;
 
 #[derive(Clone)]
 pub struct GameIcon {
@@ -49,9 +50,9 @@ pub trait DisplayLibrary{
     fn display_library(&mut self, ctx: &egui::Context);
 }
 
-impl DisplayLibrary for User{
+impl DisplayLibrary for Vapor {
     fn display_library(&mut self, ctx: &egui::Context){
-        if let Some(game_library) = &self.library {
+        if let game_library = &self.game_library {
             egui::CentralPanel::default().show(ctx, |ui| {
                 for game in game_library.iter() {
                     let (game_rect, response) = ui.allocate_exact_size(Vec2::new(200.0, 50.0), Sense::click());
@@ -65,7 +66,7 @@ impl DisplayLibrary for User{
                     );
                     if response.clicked() { game.run_game() }}
             });
-        } else {  self.library = Some(build_library()) }
+        } else {  self.game_library = build_library() }
     }
 }
 

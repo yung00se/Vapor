@@ -1,6 +1,7 @@
-use eframe::egui::{self, Color32, FontId, Sense};
+use eframe::egui::{self, Color32, FontId, Sense, CentralPanel, SidePanel, Label, Key, TextEdit};
 use eframe::emath::Vec2;
 use eframe::glow::FRAGMENT_INTERPOLATION_OFFSET_BITS;
+use crate::data_base_api::MakeRequest;
 //use crate::user_info::User;
 use crate::vapor::Vapor;
 
@@ -10,8 +11,17 @@ pub trait DisplayFriends{
 
 impl DisplayFriends for Vapor {
     fn display_friends(&mut self, ctx: &egui::Context){
+        SidePanel::left("add-friend").show(ctx, |ui| {
+            //ui.horizontal(|ui| {
+                ui.label("Add Friend");
+                ui.add(TextEdit::singleline(&mut self.add_friend_input));
+                if ui.input(|i| i.key_pressed(Key::Enter)) { 
+                    self.db_api.add_friend(self.username.as_str(), self.add_friend_input.clone().as_str());
+                }
+            //});       
+        });
         let friends_list = &self.db_api.friends_list.lock().unwrap();
-        egui::SidePanel::right("friends-list").show(ctx, |ui| {
+        SidePanel::right("friends-list").show(ctx, |ui| {
             for friend in friends_list.iter() {
                 let (friend_rect, _response) = ui.allocate_exact_size(Vec2::new(ctx.available_rect().right(), 50.0), Sense::click());
                 

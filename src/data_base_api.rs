@@ -21,6 +21,7 @@ pub trait MakeRequest {
     fn get_leaderboard(&self);
     fn get_user_stats(&self, user_id: &str);
     fn post_signup(&self, username: &str, password: &str);
+    fn add_friend(&self, username: &str, friend: &str);
 }
 
 /* 
@@ -105,7 +106,6 @@ impl MakeRequest for DbAPI{
         let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
         let end = format!("/Friend/GetAllFriends/{}", user_id);
         let url = api_url + &end;
-        eprint!("{}", url);
         // /Friend/GetAllFriends/{UserID}
         let friends_list_arc: Arc<Mutex<Vec<String>>> = Arc::clone(&self.friends_list);
         tokio::spawn(async move{
@@ -149,6 +149,32 @@ impl MakeRequest for DbAPI{
         let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
         let end = format!("/User/AddUser?username={}&password={}", username, password);
         let url = api_url + &end;
+        // User/AddUser?username=paul&password=firefire"
+        let response_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.user);
+        let client_clone = self.client.clone();
+        tokio::spawn(async move{
+            let response = client_clone.post(url).body("").send().await;
+            match response {
+                Ok(resp) => {
+                    let response_body: Vec<UserEntry> = resp.json().await.unwrap();
+                    *response_arc.lock().unwrap() = response_body;
+                },
+                Err(e) => {
+                    if e.status().unwrap() == 400 {
+                        eprint!("Username is taken\n");
+                    }
+                    else {
+                        eprint!("{}", e);
+                    }
+                }
+            }
+        });
+    }
+
+    fn add_friend(&self, username: &str, friend: &str) {
+        let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
+        // this needs to change: let end = format!("/User/AddUser?username={}&password={}", username, password);
+        let url = api_url;// + &end;
         // User/AddUser?username=paul&password=firefire"
         let response_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.user);
         let client_clone = self.client.clone();

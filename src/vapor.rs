@@ -8,17 +8,18 @@ use crate::data_base_api::{DbAPI, MakeRequest};
 use crate::pages::game_hub::DisplayLibrary;
 use crate::pages::friends_page::DisplayFriends;
 use crate::pages::leaderboard_page::DisplayLeaderboard;
-use eframe::egui::{Label, RichText, Sense, TextEdit};
-use eframe::egui::{TopBottomPanel, CentralPanel, Color32, Key};
+use eframe::egui::{Label, RichText, Sense, TextEdit, TextStyle, Align};
+use eframe::egui::{TopBottomPanel, CentralPanel, Color32, Key, Button};
                
 pub struct Vapor {
-    username: String,
+    pub username: String,
     password: String,
     id: i32,
     pub db_api: DbAPI,
     current_page: String,
     label_text: String,
-    pub game_library: Vec<GameIcon>
+    pub game_library: Vec<GameIcon>,
+    pub add_friend_input: String,
 }
 
 impl Default for Vapor{
@@ -29,8 +30,9 @@ impl Default for Vapor{
             id: -1,
             db_api: DbAPI::new(),
             current_page: "land".to_string(),
-            label_text: "Login:".to_string(),
+            label_text: "Login".to_string(),
             game_library: Vec::new(),
+            add_friend_input: "".to_string(),
         }
     }
 }
@@ -55,48 +57,87 @@ impl App for Vapor {
 
 impl Vapor {
     fn display_landing(&mut self, ctx: &egui::Context){
-        TopBottomPanel::bottom("login-or-signup").show(ctx, |ui| {
-            ui.horizontal(|ui| { if ui
-                                 .add(Label::new("Login").sense(Sense::click()))
-                                 .clicked(){ self.label_text = "Login:".into() }
+        TopBottomPanel::top("login-or-signup").show(ctx, |ui| {
+            if self.label_text == "Login" {
+                ui.horizontal(|ui| {
+                    if ui
+                        .add(Label::new(RichText::new("Login").text_style(TextStyle::Heading).color(Color32::from_rgb(0, 200, 200))).sense(Sense::click()))
+                        .clicked() { self.label_text = "Login".into() }
+    
+                        ui.add_space(75.0);
+    
+                        if ui
+                        .add(Label::new(RichText::new("Signup").text_style(TextStyle::Heading)).sense(Sense::click()))
+                        .clicked() { self.label_text = "Sign Up".into()  } /*End Login/Signup Buttons*/ });
+            }
+            else {
+                ui.horizontal(|ui| {
+                    if ui
+                        .add(Label::new(RichText::new("Login").text_style(TextStyle::Heading)).sense(Sense::click()))
+                        .clicked() { self.label_text = "Login".into() }
 
-                                 ui.add_space(75.0);
+                        ui.add_space(75.0);
 
-                                 if ui
-                                 .add(Label::new("Signup").sense(Sense::click()))
-                                 .clicked() { self.label_text = "Sign Up:".into()  } /*End Login/Signup Buttons*/ });
+                        if ui
+                        .add(Label::new(RichText::new("Signup").text_style(TextStyle::Heading).color(Color32::from_rgb(0, 150, 200))).sense(Sense::click()))
+                        .clicked() { self.label_text = "Sign Up".into()  } /*End Login/Signup Buttons*/ });
+            }
         });
         CentralPanel::default().show(ctx, |ui| {
-            ui.heading(self.label_text.clone());
+            ui.vertical_centered( |ui| {
+                ui.add_space(150.0);
+                ui.heading(self.label_text.clone());
+
+                ui.add_space(50.0);
             
-            ui.label("Username:");
-            ui.add(TextEdit::singleline(&mut self.username)); //Username Entry
+                ui.label("Username:");
+                ui.add(
+                    TextEdit::singleline(&mut self.username)
+                        .desired_width(200.0)
+                        .horizontal_align(Align::Center)
+                );
 
-            ui.label("Password:");
-            ui.add(TextEdit::singleline(&mut self.password).password(true));
+                
+                ui.add_space(10.0);
+                ui.label("Password:");
+                ui.add(
+                    TextEdit::singleline(&mut self.password)
+                        .desired_width(200.0)
+                        .horizontal_align(Align::Center)
+                        .password(true)
+                );
+            
 
-            ui.label(RichText::new("Test").color(Color32::RED));
+                ui.add_space(20.0);
+                //ui.label(RichText::new("Test").color(Color32::RED));
+                let button = ui.add(Button::new(self.label_text.clone()));
+                if ui.input(|i| i.key_pressed(Key::Enter)) 
+                    || button.clicked() { 
+                        if self.label_text.clone() == "Login" {
+                            println!("im here");
+                            self.request_login();
+                        }
+                        else {self.request_signup();}
+                }
+            });
 
-            if ui.input(|i| i.key_pressed(Key::Enter)) { 
-                if self.label_text.clone() == "Login:" {self.request_login();}
-                else {self.request_signup();}
-            }});
+            });
     }
 
     fn show_nav_bar(&mut self, ctx: &egui::Context){
         egui::TopBottomPanel::top("page-directory").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                if ui
-                    .add(Label::new("Games").sense(Sense::click()))
-                    .clicked() { 
-                        self.current_page = "lib".to_string();
+                let games_button = ui.add(Button::new("Games"));
+                ui.add_space(75.0);
+                let friends_button = ui.add(Button::new("Friends"));
+                ui.add_space(75.0);
+                let leaderboard_button = ui.add(Button::new("Leaderboard"));
+
+                if games_button.clicked() {
+                    self.current_page = "lib".to_string();
                 }
 
-                ui.add_space(75.0);
-
-                if ui
-                    .add(Label::new("Friends").sense(Sense::click()))
-                    .clicked() {
+                if friends_button.clicked() {
                         self.current_page = "friends".to_string();
 
                         self.db_api.get_friends_list(self.id.to_string().as_str());
@@ -104,11 +145,7 @@ impl Vapor {
                         eprint!("Got friends list");
                 }
 
-                ui.add_space(75.0);
-
-                if ui
-                    .add(Label::new("Leaderboards").sense(Sense::click()))
-                    .clicked() {
+                if leaderboard_button.clicked() {
                         self.current_page ="leaderboards".to_string();
                         // Make get call here
                         self.db_api.get_leaderboard();

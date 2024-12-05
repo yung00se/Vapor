@@ -206,8 +206,10 @@ impl MakeRequest for DbAPI{
             let response = client_clone.post(url).body("").send().await;
             match response {
                 Ok(resp) => {
-                    let response_body: Vec<UserEntry> = resp.json().await.unwrap();
-                    *response_arc.lock().unwrap() = response_body;
+                    match resp.json().await{
+                        Ok(list) => {*response_arc.lock().unwrap() = list},
+                        Err(e) => eprint!("{e}"),
+                    }
                 },
                 Err(e) => {
                     if e.status().unwrap() == 400 {

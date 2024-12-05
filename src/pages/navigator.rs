@@ -35,9 +35,8 @@ impl NavBar for Vapor{
                     .add(Label::new("Leaderboards").sense(Sense::click()))
                     .clicked() {
                         self.current_page ="leaderboards".to_string();
-                        let db_api = DbAPI::new();
                         // Make get call here
-                        db_api.get_leaderboard();
+                        self.db_api.get_leaderboard();
 
                         // let first_user= db_api.leaderboard.lock().unwrap().pop();
                 }/*End Page Directory*/});

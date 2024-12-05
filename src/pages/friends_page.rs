@@ -8,7 +8,6 @@ use crate::vapor::Vapor;
 pub trait DisplayFriends{
     fn display_users(&mut self, ctx: &egui::Context);
     fn display_friends(&mut self, ctx: &egui::Context);
-    fn friends_bar(&mut self, ctx: &egui::Context);
 }
 
 impl DisplayFriends for Vapor {
@@ -57,12 +56,6 @@ impl DisplayFriends for Vapor {
                                     friend.clone(), //+ format!("\t\t\tHigh Score: {}", friend.HighScore.to_string().as_str()).as_str(),
                                     FontId::default(),
                                     Color32::from_rgb(40, 40, 40));}                    
-        });
-    }
-
-    fn friends_bar(&mut self, ctx: &egui::Context){
-        egui::Window::new("Friends Window").show(ctx, |ui| {
-            ui.label("Friends:");
         });
     }
 }

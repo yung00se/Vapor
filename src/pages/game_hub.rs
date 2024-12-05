@@ -48,11 +48,16 @@ impl GameIcon {
 
 pub trait DisplayLibrary{
     fn display_library(&mut self, ctx: &egui::Context);
+    fn get_library_path(&mut self);
 }
 
 impl DisplayLibrary for Vapor {
+    fn get_library_path(&mut self){
+        
+    }
+
     fn display_library(&mut self, ctx: &egui::Context){
-        if let game_library = &self.game_library {
+        let game_library = build_library();
             egui::CentralPanel::default().show(ctx, |ui| {
                 for game in game_library.iter() {
                     let (game_rect, response) = ui.allocate_exact_size(Vec2::new(200.0, 50.0), Sense::click());
@@ -66,13 +71,12 @@ impl DisplayLibrary for Vapor {
                     );
                     if response.clicked() { game.run_game() }}
             });
-        } else {  self.game_library = build_library() }
     }
 }
 
 pub fn build_library() -> Vec<GameIcon>{   
     let mut games: Vec<GameIcon> = Vec::new();
-    /* 
+
     for result in WalkDir::new("/home/PDykes/Vapor").min_depth(1).max_depth(3){
         let entry = result.expect("No File...");
         let filename = entry.file_name().to_str().expect("Error converting game file-name from osStr => &str");
@@ -88,7 +92,6 @@ pub fn build_library() -> Vec<GameIcon>{
         games.push(icon);
         eprint!("Icon for: {} created...", filename)
     };
-    */
     games
 }
 

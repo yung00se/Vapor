@@ -17,6 +17,7 @@ use reqwest::Error;
 
 pub trait MakeRequest {
     fn get_login(&self, username: &str);
+    fn get_user_list(&self);
     fn get_friends_list(&self, user_id: &str);
     fn get_leaderboard(&self);
     fn get_user_stats(&self, user_id: &str);
@@ -67,6 +68,7 @@ pub struct DbAPI {
     pub client: Client,
     pub user: Arc<Mutex<Vec<UserEntry>>>,
     pub friends_list: Arc<Mutex<Vec<String>>>,
+    pub user_list: Arc<Mutex<Vec<UserEntry>>>,
     pub leaderboard: Arc<Mutex<Vec<UserEntry>>>,
 }
 
@@ -76,6 +78,7 @@ impl DbAPI {
             client: Client::new(),
             user: Arc::new(Mutex::new(Vec::new())),
             friends_list: Arc::new(Mutex::new(Vec::new())),
+            user_list: Arc::new(Mutex::new(Vec::new())),
             leaderboard: Arc::new(Mutex::new(Vec::new())),
         }
     }
@@ -92,8 +95,29 @@ impl MakeRequest for DbAPI{
             let response = reqwest::get(url).await;
             match response {
                 Ok(resp) => {
-                    let mut response_body: Vec<UserEntry> = resp.json().await.expect("Error Logging in");
+                    let response_body: Vec<UserEntry> = resp.json().await.expect("Error Logging in");
                     *user_arc.lock().unwrap() = response_body;
+                },
+                Err(e) => {
+                    eprint!("{}", e);
+                }
+            }
+        });
+    }
+
+    fn get_user_list(&self) {
+        let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
+        let end = format!("/User/GetAllUsers");
+        let url = api_url + &end;
+        eprint!("{}", url);
+        // /Friend/GetAllFriends/{UserID}
+        let user_list_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.user_list);
+        tokio::spawn(async move{
+            let response = reqwest::get(url).await;
+            match response {
+                Ok(resp) => {
+                    let response_body: Vec<UserEntry> = resp.json().await.expect("Error getting friends list");
+                    *user_list_arc.lock().unwrap() = response_body;
                 },
                 Err(e) => {
                     eprint!("{}", e);

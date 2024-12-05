@@ -11,7 +11,6 @@ pub struct User {
     pub friends: Vec<UserEntry>,
     pub leaderboard: Vec<UserEntry>,
     pub current_page: String,
-    pub got_response: bool,
 }
 
 impl Default for User{
@@ -24,7 +23,6 @@ impl Default for User{
             friends: Vec::new(),
             leaderboard: Vec::new(),
             current_page: "land".to_string(),
-            got_response: false,
         }
     }
 }
@@ -39,7 +37,6 @@ impl User {
             friends: Vec::new(),
             leaderboard: Vec::new(),
             current_page: "land".to_string(),
-            got_response: false,
         }
     } 
     
@@ -66,9 +63,9 @@ impl User {
     }
     */
 
-    pub fn show_current_page(&mut self, ctx: &egui::Context){
-        if self.current_page == "lib" {self.display_library(ctx)}
-        else if self.current_page == "friends" {self.display_friends(ctx)}
-        else if self.current_page == "leaderboards" {self.display_leaderboard(ctx)}
-    }
+    // pub fn show_current_page(&mut self, ctx: &egui::Context){
+    //     if self.current_page == "lib" {self.display_library(ctx)}
+    //     else if self.current_page == "friends" {self.display_friends(ctx)}
+    //     else if self.current_page == "leaderboards" {self.display_leaderboard(ctx)}
+    // }
 }

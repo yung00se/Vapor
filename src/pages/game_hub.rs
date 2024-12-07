@@ -23,6 +23,22 @@ impl Default for GameIcon {
 }
 
 impl GameIcon{
+    pub fn run_game(&self) {
+       let mut game_instance = 
+            Command::new(&self.path)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("Game not found in Vapor Path...");
+
+        if let Some(game_output) = &mut game_instance.stdout {
+            let lines = BufReader::new(game_output).lines().enumerate().take(64);
+            for line in lines {
+                println!("Word Scrambler: {:?}", line);
+            }
+        }
+    }
+
     fn generate_icon_rect(&mut self){
         let index = self.id as f32;
         let top_left = Pos2::from(     ((100.0 * index) +  5.0   ,  5.0));

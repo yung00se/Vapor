@@ -1,19 +1,7 @@
-//use eframe::egui::mutex::Mutex;
-use std::collections::HashMap;
-
-use std::f32::consts::E;
-use std::hash::Hash;
 use std::sync::{Arc, Mutex};
 use serde::{Serialize, Deserialize};
 use reqwest::Client;
-use reqwest::Response;
-use tokio::runtime::Runtime;
-use tokio::{self, sync::Notify};
-use core::error;
-use std::default;
-use reqwest::Error;
-
-//use crate::user_info::User;
+use tokio;
 
 pub trait MakeRequest {
     fn get_login(&self, username: &str);
@@ -197,7 +185,7 @@ impl MakeRequest for DbAPI{
 
     fn add_friend(&self, username: &str, friend: &str) {
         let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
-        // this needs to change: let end = format!("/User/AddUser?username={}&password={}", username, password);
+         // this needs to change: let end = format!("/User/AddUser?username={}&password={}", username, password);
         let url = api_url;// + &end;
         // User/AddUser?username=paul&password=firefire"
         let response_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.user);

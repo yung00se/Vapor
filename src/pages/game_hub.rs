@@ -1,7 +1,8 @@
 use eframe::{egui::{self, Color32, FontId, Pos2, Rect, Rounding, Sense, Shape, Stroke, Vec2},
              epaint::RectShape};
 use walkdir::WalkDir;
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::io::{Read, Write, BufRead, BufReader};
 
 //use crate::user_info::User;
 use crate::vapor::Vapor;
@@ -51,14 +52,6 @@ impl GameIcon{
             Stroke::new(
                 1.0,
                 Color32::BLACK)))
-    }
-}
-
-impl GameIcon {
-    pub fn run_game(&self) {
-        Command::new(&self.path)
-            .spawn()
-            .expect("Game not found in Vapor Path...");
     }
 }
 

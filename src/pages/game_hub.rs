@@ -1,8 +1,9 @@
 use eframe::{egui::{self, Color32, FontId, Pos2, Rect, Rounding, Sense, Shape, Stroke, Vec2},
              epaint::RectShape};
 use walkdir::WalkDir;
-use std::process::{Command, Stdio};
+use std::{env, path::PathBuf, process::{Command, Stdio}};
 use std::io::{Read, Write, BufRead, BufReader};
+use std::fs;
 
 //use crate::user_info::User;
 use crate::vapor::Vapor;
@@ -85,22 +86,38 @@ impl DisplayLibrary for Vapor {
 
 pub fn build_library() -> Vec<GameIcon>{   
     let mut games: Vec<GameIcon> = Vec::new();
+    
+    let mut path = PathBuf::new();
 
-    for result in WalkDir::new("/home/PDykes/Vapor").min_depth(1).max_depth(3){
-        let entry = result.expect("No File...");
-        let filename = entry.file_name().to_str().expect("Error converting game file-name from osStr => &str");
-        let path = entry.path().to_str().expect("Error unwrapping path");
-        
-        let mut icon = GameIcon{
-            title: filename.into(),
-            id: games.len() as i16,
-            rect: Shape::Noop,
-            path: path.into()};
-        icon.generate_icon_rect();
-        eprint!("{:?}", icon.id);
-        games.push(icon);
-        eprint!("Icon for: {} created...", filename)
+    match env::current_exe(){
+        Ok(vapor_path) => { 
+            path.push(vapor_path);
+            path.pop();
+            path.push("library");
+            eprint!("Path to Game Library: {:?}", &path);
+        },
+        Err(e) => eprint!("Error fetching path to Vapor exe: {e}"),
     };
+
+    if !fs::exists(&path).expect("Error evaluating path to game library..."){
+        fs::create_dir(&path).expect("Could not create game library directory");
+    }
+        for result in WalkDir::new(&path){
+            let entry = result.expect("No File...");
+            let filename = entry.file_name().to_str().expect("Error converting game file-name from osStr => &str");
+            let path = entry.path().to_str().expect("Error unwrapping path");
+            
+            let mut icon = GameIcon{
+                title: filename.into(),
+                id: games.len() as i16,
+                rect: Shape::Noop,
+                path: path.into()};
+            icon.generate_icon_rect();
+            eprint!("{:?}", icon.id);
+            games.push(icon);
+            eprint!("Icon for: {} created...", filename)
+        };
+
     games
 }
 

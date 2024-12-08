@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 use serde::{Serialize, Deserialize};
 use reqwest::Client;
-use tokio;
+use tokio::{self, sync::Notify};
 
 pub trait MakeRequest {
     fn get_login(&self, username: &str);
@@ -58,6 +58,8 @@ pub struct DbAPI {
     pub friends_list: Arc<Mutex<Vec<String>>>,
     pub user_list: Arc<Mutex<Vec<UserEntry>>>,
     pub leaderboard: Arc<Mutex<Vec<UserEntry>>>,
+    
+    pub update_indicator: Arc<Mutex<bool>>,
 }
 
 impl DbAPI {
@@ -68,6 +70,8 @@ impl DbAPI {
             friends_list: Arc::new(Mutex::new(Vec::new())),
             user_list: Arc::new(Mutex::new(Vec::new())),
             leaderboard: Arc::new(Mutex::new(Vec::new())),
+            
+            update_indicator: Arc::new(Mutex::new(false)),
         }
     }
 }
@@ -187,26 +191,14 @@ impl MakeRequest for DbAPI{
         let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
         let end = format!("/Friend/SendFriendRequest?userId={}&friendUsername={}", user_id, friend);
         let url = api_url + &end;
-        // User/AddUser?username=paul&password=firefire"
-        let response_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.user);
+        
+        let update_notifier = self.update_indicator.clone();
         let client_clone = self.client.clone();
         tokio::spawn(async move{
             let response = client_clone.post(url).body("").send().await;
             match response {
-                Ok(resp) => {
-                    match resp.json().await{
-                        Ok(list) => {*response_arc.lock().unwrap() = list},
-                        Err(e) => eprint!("{e}"),
-                    }
-                },
-                Err(e) => {
-                    if e.status().unwrap() == 400 {
-                        eprint!("Username is taken\n");
-                    }
-                    else {
-                        eprint!("{}", e);
-                    }
-                }
+                Ok(_) => {*update_notifier.lock().unwrap() = true},
+                Err(e) => eprint!("Error sending friend request: {e}"),
             }
         });
     }

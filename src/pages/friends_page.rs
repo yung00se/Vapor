@@ -46,8 +46,6 @@ impl DisplayFriends for Vapor {
                     ui.add_space(15.0);
                     if ui.add(egui::Button::new("Add Friend")).clicked() {
                         self.db_api.add_friend(self.current_user.id, &user.Username);
-                        sleep(Duration::from_millis(250));
-                        self.db_api.get_friends_list(self.current_user.id);
                     }
                 });
 

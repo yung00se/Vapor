@@ -10,7 +10,7 @@ pub trait MakeRequest {
     fn get_leaderboard(&self);
     fn get_user_stats(&self, user_id: &str);
     fn post_signup(&self, username: &str, password: &str);
-    fn add_friend(&self, username: &str, friend: &str);
+    fn add_friend(&self, username: i32, friend: &str);
 }
 
 /* 
@@ -183,10 +183,10 @@ impl MakeRequest for DbAPI{
         });
     }
 
-    fn add_friend(&self, username: &str, friend: &str) {
+    fn add_friend(&self, user_id: i32, friend: &str) {
         let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
-         // this needs to change: let end = format!("/User/AddUser?username={}&password={}", username, password);
-        let url = api_url;// + &end;
+        let end = format!("/Friend/SendFriendRequest?userId={}&friendUsername={}", user_id, friend);
+        let url = api_url + &end;
         // User/AddUser?username=paul&password=firefire"
         let response_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.user);
         let client_clone = self.client.clone();

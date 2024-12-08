@@ -34,7 +34,7 @@ impl DisplayFriends for Vapor {
 
                 egui::popup::popup_above_or_below_widget(ui, popup_id, &user_button, above, close_on_unfocus, |ui|{
                     if ui.add(egui::Button::new("Add Friend")).clicked() {
-                        self.db_api.add_friend(&self.current_user.name, &user.Username);
+                        self.db_api.add_friend(self.current_user.id, &user.Username);
                     }
                 });
 
@@ -72,7 +72,7 @@ impl DisplayFriends for Vapor {
                 ui.label("Add Friend");
                 ui.add(TextEdit::singleline(&mut self.add_friend_input));
                 if ui.input(|i| i.key_pressed(Key::Enter)) { 
-                    self.db_api.add_friend(self.current_user.name.as_str(), self.add_friend_input.clone().as_str());
+                    self.db_api.add_friend(self.current_user.id, self.add_friend_input.clone().as_str());
                 }
         });
     }

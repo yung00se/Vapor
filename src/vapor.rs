@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use eframe::{App, Frame,
              egui::{self, Label, RichText, Sense, TextEdit, TextStyle, Align, TopBottomPanel, CentralPanel, Color32, Key, Button}};
 use crate::data_base_api::{DbAPI, MakeRequest};
@@ -35,6 +37,7 @@ impl App for Vapor {
         }
         //Draw the current page
         self.show_current_page(ctx);
+        ctx.request_repaint_after(Duration::from_millis(100));
     }
 }
 

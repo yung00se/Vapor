@@ -1,4 +1,5 @@
 use eframe::egui;
+use emath::Align2;
 use crate::vapor::Vapor;
 use std::{fs::{self, File}, io::{BufRead, BufReader, Write}, process::{Child, ChildStdin, ChildStdout, Command, Stdio}, sync::{Arc, Mutex}, time::Duration};
 
@@ -49,7 +50,12 @@ pub trait ChatBar{
 
 impl ChatBar for Chat {
     fn display_chat_bar(&mut self, ctx: &egui::Context) {
-        egui::Window::new("Chat").show(ctx, |ui| {
+        egui::Window::new("Chat")
+            .min_height(200.0)
+            .max_height(200.0)
+            .anchor(Align2::LEFT_BOTTOM, [10.0, 0.0])
+            .pivot(Align2::LEFT_BOTTOM)
+            .show(ctx, |ui| {
             let buffer = self.buffer.lock().unwrap();
             for message in buffer.iter() {
                 ui.add(egui::Label::new(message));

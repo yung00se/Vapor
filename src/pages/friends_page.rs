@@ -57,6 +57,7 @@ impl DisplayFriends for Vapor {
     }
 
     fn display_friends(&mut self, ctx: &egui::Context){
+        self.db_api.get_friends_list(self.current_user.id);
        egui::Window::new("Friends")
             .constrain(false)
             .pivot(Align2::RIGHT_BOTTOM)

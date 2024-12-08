@@ -10,7 +10,7 @@ pub struct Chat{
 
 impl Chat{
     pub fn new() -> Self{
-        let mut child = Command::new("python")
+        let mut child = Command::new("python3")
             .arg("-u")
             .arg("./python_client/main.py")
             .stdin(Stdio::piped())

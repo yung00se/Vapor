@@ -1,4 +1,4 @@
-use eframe::egui::{self, epaint};
+use eframe::egui::{self, epaint, Color32};
 use emath::Align2;
 use std::{env, io::{BufRead, BufReader, Write}, process::{Child, ChildStdin, ChildStdout, Command, Stdio}, sync::{Arc, Mutex}, time::Duration};
 
@@ -20,14 +20,12 @@ impl Chat{
 
         let buffer: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
         let buffer_clone = Arc::clone(&buffer);
-        //let child_stdout = child.stdout.expect("Failed to get stdout of child");
-        
 
         std::thread::spawn(move || {
             if let Some(chat_output) = &mut child.stdout {
                 let reader = BufReader::new(chat_output).lines().enumerate().take(128);
 
-                for (size, line) in reader{
+                for (_, line) in reader{
                     let output = line.expect("Failed");
                     buffer_clone.lock().unwrap().push(output);
                 }
@@ -49,11 +47,10 @@ pub trait ChatBar{
 
 impl ChatBar for Chat {
     fn display_chat_bar(&mut self, ctx: &egui::Context) {
-        let dir = env::current_dir().unwrap();
-        eprint!("{:?}", dir);
         egui::Window::new("Chat")
             .frame(egui::Frame{
                 fill: egui::Color32::from_rgb(92, 30, 38),
+                rounding: egui::Rounding::same(5.0),
                 ..Default::default()
             })
             .min_height(200.0)
@@ -63,21 +60,37 @@ impl ChatBar for Chat {
             .anchor(Align2::LEFT_BOTTOM, [10.0, 0.0])
             .pivot(Align2::LEFT_BOTTOM)
             .show(ctx, |ui| {
-                ui.with_layout(egui::Layout::bottom_up(egui::Align::BOTTOM), |ui|{
+                ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui|{
 
-                    let input = ui
-                        .add(egui::TextEdit::singleline(&mut self.message)
-                             .hint_text("Type here..."));
+                    egui::Frame::none()//Blank frame for styling the text edit box
+                        .fill(egui::Color32::from_rgb(56, 18, 23))
+                        .show(ui, |ui|{
+                            ui.add(egui::TextEdit::singleline(&mut self.message)
+                                   .return_key(None)
+                                   .frame(false)//Override default text edit style
+                                   .text_color(egui::Color32::from_rgb(252, 251, 182))
+                                   .desired_width(ui.available_width())
+                                   .hint_text("Type here..."));
+                        });//End text input
 
                     let buffer = self.buffer.lock().unwrap();
-                    egui::ScrollArea::vertical().show(ui, |ui| { 
-                        for message in buffer.iter() { ui.add(egui::Label::new(message)); }
-                    });//End Scroll Area
+                    ui.with_layout(egui::Layout::top_down(egui::Align::LEFT), |ui| {
+                        egui::ScrollArea::vertical()
+                            .stick_to_bottom(true)
+                            .show(ui, |ui| { 
+                                ui.set_width(ui.available_width());
+                                for message in buffer.iter() { ui.colored_label(
+                                    egui::Color32::from_rgb(252, 251, 182), 
+                                    message); }
+                            });//End Scroll Area
+                    });
 
                     if ui.input(|i|{ i.key_pressed(egui::Key::Enter) }) {
-                        self.child_stdin.write_all(format!("{}\n", self.message).as_bytes()).expect("Failed to write to chat service");
+                        self.child_stdin
+                            .write_all(format!("{}\n", self.message).as_bytes())
+                            .expect("Failed to write to chat service");
                         self.message.clear() }
                 });//End bottom_up display area
-        });//End Window
+            });//End Window
     }
 }

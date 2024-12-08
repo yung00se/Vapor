@@ -52,7 +52,9 @@ impl ChatBar for Chat {
     fn display_chat_bar(&mut self, ctx: &egui::Context) {
         egui::Window::new("Chat")
             .min_height(200.0)
-            .max_height(200.0)
+            .max_height(300.0)
+            .collapsible(true)
+            .scroll([false, true])//Horizontal Scrolling: False, Vertical Scrolling: True
             .anchor(Align2::LEFT_BOTTOM, [10.0, 0.0])
             .pivot(Align2::LEFT_BOTTOM)
             .show(ctx, |ui| {

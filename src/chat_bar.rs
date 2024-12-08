@@ -59,7 +59,7 @@ impl ChatBar for Chat {
                 egui::TextEdit::singleline(&mut self.message)
                     .hint_text("Type here..."));
             if ui.input(|i|{ i.key_pressed(egui::Key::Enter) }) {
-                //self.buffer.push(self.message.clone());
+                self.child_stdin.write_all(format!("{}\n", self.message).as_bytes()).expect("Failed to write to chat service");
                 self.message.clear();
             }
         });

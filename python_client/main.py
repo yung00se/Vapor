@@ -29,12 +29,10 @@ from time import sleep
 import sys
 
 def main():
-    # Disable output buffering
-    sys.stdout.reconfigure(line_buffering=True)
-    
-    while True:
-        print("Hello from python", flush=True)
-        sleep(1)
+    for line in sys.stdin:
+        line = line.strip()
+        if line:
+            print(f"Python reeived: {line}", flush=True)
 
 if __name__ == "__main__":
     main()

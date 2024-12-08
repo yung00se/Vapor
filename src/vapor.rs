@@ -34,6 +34,11 @@ impl App for Vapor {
         } else {
             self.show_nav_bar(ctx);
             self.display_friends(ctx);
+
+            if *self.db_api.update_indicator.lock().unwrap() == true {
+                self.db_api.get_friends_list(self.current_user.id);
+                *self.db_api.update_indicator.lock().unwrap() = false;
+            }
         }
         //Draw the current page
         self.show_current_page(ctx);

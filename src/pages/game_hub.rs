@@ -58,29 +58,23 @@ impl GameIcon{
 
 pub trait DisplayLibrary{
     fn display_library(&mut self, ctx: &egui::Context);
-    fn get_library_path(&mut self);
 }
 
 impl DisplayLibrary for Vapor {
-    fn get_library_path(&mut self){
-        
-    }
-
     fn display_library(&mut self, ctx: &egui::Context){
-        let game_library = build_library();
-            egui::CentralPanel::default().show(ctx, |ui| {
-                for game in game_library.iter() {
-                    let (game_rect, response) = ui.allocate_exact_size(Vec2::new(200.0, 50.0), Sense::click());
-                    ui.painter().rect_filled(game_rect, 0.0, Color32::BLACK);
-                    ui.painter().text(
-                        game_rect.center(),
-                        egui::Align2::CENTER_CENTER,
-                        game.title.clone(),
-                        FontId::default(),
-                        Color32::WHITE,
-                    );
-                    if response.clicked() { game.run_game() }}
-            });
+        egui::CentralPanel::default().show(ctx, |ui| {
+            for game in self.game_library.iter() {
+                let (game_rect, response) = ui.allocate_exact_size(Vec2::new(200.0, 50.0), Sense::click());
+                ui.painter().rect_filled(game_rect, 0.0, Color32::BLACK);
+                ui.painter().text(
+                    game_rect.center(),
+                    egui::Align2::CENTER_CENTER,
+                    game.title.clone(),
+                    FontId::default(),
+                    Color32::WHITE,
+                );
+                if response.clicked() { game.run_game() }}
+        });
     }
 }
 
@@ -104,18 +98,19 @@ pub fn build_library() -> Vec<GameIcon>{
     }
         for result in WalkDir::new(&path){
             let entry = result.expect("No File...");
-            let filename = entry.file_name().to_str().expect("Error converting game file-name from osStr => &str");
-            let path = entry.path().to_str().expect("Error unwrapping path");
-            
-            let mut icon = GameIcon{
-                title: filename.into(),
-                id: games.len() as i16,
-                rect: Shape::Noop,
-                path: path.into()};
-            icon.generate_icon_rect();
-            eprint!("{:?}", icon.id);
-            games.push(icon);
-            eprint!("Icon for: {} created...", filename)
+            if entry.file_type().is_file() {
+                let filename = entry.file_name().to_str().expect("Error converting game file-name from osStr => &str");
+                let path = entry.path().to_str().expect("Error unwrapping path");
+                let mut icon = GameIcon{
+                    title: filename.into(),
+                    id: games.len() as i16,
+                    rect: Shape::Noop,
+                    path: path.into()};
+                icon.generate_icon_rect();
+                eprint!("{:?}", icon.id);
+                games.push(icon);
+                eprint!("Icon for: {} created...", filename)
+            }            
         };
 
     games

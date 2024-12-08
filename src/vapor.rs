@@ -2,7 +2,7 @@ use eframe::{App, Frame,
              egui::{self, Label, RichText, Sense, TextEdit, TextStyle, Align, TopBottomPanel, CentralPanel, Color32, Key, Button}};
 use crate::data_base_api::{DbAPI, MakeRequest};
 use crate::user_info::User;
-use crate::pages::{navigator::NavBar, game_hub::{DisplayLibrary, GameIcon}, friends_page::DisplayFriends, leaderboard_page::DisplayLeaderboard};
+use crate::pages::{navigator::NavBar, game_hub::{DisplayLibrary, GameIcon, build_library}, friends_page::DisplayFriends, leaderboard_page::DisplayLeaderboard};
 
 pub struct Vapor {
     pub current_user: User,
@@ -18,7 +18,7 @@ impl Default for Vapor{
             current_user: User::new("".into(), "".into(), -1),
             db_api: DbAPI::new(),
             current_page: "login".to_string(),
-            game_library: Vec::new(),
+            game_library: build_library(),
             add_friend_input: "".to_string(),
         }
     }

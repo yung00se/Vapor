@@ -11,6 +11,7 @@ pub struct Chat{
 impl Chat{
     pub fn new() -> Self{
         let mut child = Command::new("python")
+            .arg("-u")
             .arg("./python_client/main.py")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -27,9 +28,8 @@ impl Chat{
                 let reader = BufReader::new(chat_output).lines().enumerate().take(128);
 
                 for (size, line) in reader{
-                    //eprint!("im here");
                     let output = line.expect("Failed");
-                    eprint!("[{}]", output);
+                    buffer_clone.lock().unwrap().push(output);
                 }
             }
             else {}

@@ -1,7 +1,6 @@
-use eframe::egui;
+use eframe::egui::{self, epaint};
 use emath::Align2;
-use crate::vapor::Vapor;
-use std::{fs::{self, File}, io::{BufRead, BufReader, Write}, process::{Child, ChildStdin, ChildStdout, Command, Stdio}, sync::{Arc, Mutex}, time::Duration};
+use std::{env, io::{BufRead, BufReader, Write}, process::{Child, ChildStdin, ChildStdout, Command, Stdio}, sync::{Arc, Mutex}, time::Duration};
 
 pub struct Chat{
     buffer: Arc<Mutex<Vec<String>>>,
@@ -50,7 +49,13 @@ pub trait ChatBar{
 
 impl ChatBar for Chat {
     fn display_chat_bar(&mut self, ctx: &egui::Context) {
+        let dir = env::current_dir().unwrap();
+        eprint!("{:?}", dir);
         egui::Window::new("Chat")
+            .frame(egui::Frame{
+                fill: egui::Color32::from_rgb(92, 30, 38),
+                ..Default::default()
+            })
             .min_height(200.0)
             .max_height(300.0)
             .collapsible(true)
@@ -58,18 +63,21 @@ impl ChatBar for Chat {
             .anchor(Align2::LEFT_BOTTOM, [10.0, 0.0])
             .pivot(Align2::LEFT_BOTTOM)
             .show(ctx, |ui| {
-            let buffer = self.buffer.lock().unwrap();
-            for message in buffer.iter() {
-                ui.add(egui::Label::new(message));
-            }
+                ui.with_layout(egui::Layout::bottom_up(egui::Align::BOTTOM), |ui|{
 
-            let input = ui.add(
-                egui::TextEdit::singleline(&mut self.message)
-                    .hint_text("Type here..."));
-            if ui.input(|i|{ i.key_pressed(egui::Key::Enter) }) {
-                self.child_stdin.write_all(format!("{}\n", self.message).as_bytes()).expect("Failed to write to chat service");
-                self.message.clear();
-            }
-        });
+                    let input = ui
+                        .add(egui::TextEdit::singleline(&mut self.message)
+                             .hint_text("Type here..."));
+
+                    let buffer = self.buffer.lock().unwrap();
+                    egui::ScrollArea::vertical().show(ui, |ui| { 
+                        for message in buffer.iter() { ui.add(egui::Label::new(message)); }
+                    });//End Scroll Area
+
+                    if ui.input(|i|{ i.key_pressed(egui::Key::Enter) }) {
+                        self.child_stdin.write_all(format!("{}\n", self.message).as_bytes()).expect("Failed to write to chat service");
+                        self.message.clear() }
+                });//End bottom_up display area
+        });//End Window
     }
 }

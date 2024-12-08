@@ -1,7 +1,5 @@
-use eframe::{egui::IconData, glow::NativeVertexArray, NativeOptions};
+use eframe::NativeOptions;
 use vapor::vapor::Vapor;
-//use eframe::IconData;
-use image::ImageReader;
 
 
 #[tokio::main]

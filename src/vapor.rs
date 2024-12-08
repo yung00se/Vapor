@@ -4,6 +4,7 @@ use eframe::{App, Frame,
              egui::{self, Label, RichText, Sense, TextEdit, TextStyle, Align, TopBottomPanel, CentralPanel, Color32, Key, Button}};
 use crate::{data_base_api::{DbAPI, MakeRequest}, pages::leaderboard_page::Leaderboard};
 use crate::user_info::User;
+use crate::chat_bar::{Chat, ChatBar};
 use crate::pages::{navigator::NavBar, game_hub::{DisplayLibrary, GameIcon, build_library}, friends_page::DisplayFriends, leaderboard_page::DisplayLeaderboard};
 
 pub struct Vapor {
@@ -12,7 +13,7 @@ pub struct Vapor {
     pub current_page: String,
     pub game_library: Vec<GameIcon>,
     pub add_friend_input: String,
-    pub leaderboard: Leaderboard,
+    pub chat: Chat,
 }
 
 impl Default for Vapor{
@@ -23,7 +24,7 @@ impl Default for Vapor{
             current_page: "login".to_string(),
             game_library: build_library(),
             add_friend_input: "".to_string(),
-            leaderboard: Leaderboard::default(),
+            chat: Chat::new(),
         }
     }
 }
@@ -36,7 +37,7 @@ impl App for Vapor {
         } else {
             self.show_nav_bar(ctx);
             self.display_friends(ctx);
-
+            self.chat.display_chat_bar(ctx);
             if *self.db_api.update_indicator.lock().unwrap() == true {
                 self.db_api.get_friends_list(self.current_user.id);
                 *self.db_api.update_indicator.lock().unwrap() = false;

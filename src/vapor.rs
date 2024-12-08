@@ -13,6 +13,7 @@ pub struct Vapor {
     pub current_page: String,
     pub game_library: Vec<GameIcon>,
     pub add_friend_input: String,
+    pub leaderboard: Leaderboard,
     pub chat: Chat,
 }
 
@@ -24,6 +25,7 @@ impl Default for Vapor{
             current_page: "login".to_string(),
             game_library: build_library(),
             add_friend_input: "".to_string(),
+            leaderboard: Leaderboard::default(),
             chat: Chat::new(),
         }
     }

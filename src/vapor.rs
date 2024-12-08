@@ -42,7 +42,7 @@ impl App for Vapor {
         }
         //Draw the current page
         self.show_current_page(ctx);
-        ctx.request_repaint_after(Duration::from_millis(100));
+        ctx.request_repaint_after(Duration::from_millis(250));
     }
 }
 

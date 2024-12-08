@@ -1,7 +1,7 @@
 use eframe::{egui::{self, Color32, FontId, Pos2, Rect, Rounding, Sense, Shape, Stroke, Vec2},
              epaint::RectShape};
 use walkdir::WalkDir;
-use std::{env, path::PathBuf, process::{Command, Stdio}};
+use std::{env, path::PathBuf, process::{Command, Stdio}, thread};
 use std::io::{Read, Write, BufRead, BufReader};
 use std::fs;
 
@@ -26,19 +26,32 @@ impl Default for GameIcon {
 
 impl GameIcon{
     pub fn run_game(&self) {
-       let mut game_instance = 
+        let mut game_instance = 
             Command::new(&self.path)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()
             .expect("Game not found in Vapor Path...");
+        thread::spawn(move || {
+            if let Some(game_output) = &mut game_instance.stdout {
+                let lines = BufReader::new(game_output).lines().enumerate().take(64);
+                for (_, line) in lines {
+                    eprint!("{:?}", &line);
+                    let game_output = line.unwrap();
+                    let mut split_output = game_output.split(' ');
+                    let game_name = split_output.next().expect("Empty game data");
 
-        if let Some(game_output) = &mut game_instance.stdout {
-            let lines = BufReader::new(game_output).lines().enumerate().take(64);
-            for line in lines {
-                println!("Word Scrambler: {:?}", line);
+                    if game_name == "Word_Unscrambler"{
+                        let score = split_output.next().expect("Missing Score Data");
+                        let ratio = split_output.next().expect("Missing Correct/Incorrect Ratio");
+                        println!("{game_name}: Score: {score} Ratio: {ratio}");
+                    }
+                    else if game_name == "Sudoku"{
+                        
+                    }
+                }
             }
-        }
+        });
     }
 
     fn generate_icon_rect(&mut self){
@@ -73,7 +86,8 @@ impl DisplayLibrary for Vapor {
                     FontId::default(),
                     Color32::WHITE,
                 );
-                if response.clicked() { game.run_game() }}
+                if response.clicked() { game.run_game() } 
+            }
         });
     }
 }

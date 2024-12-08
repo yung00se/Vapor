@@ -22,7 +22,7 @@ impl NavBar for Vapor{
                 if ui
                     .add(Label::new("Friends").sense(Sense::click()))
                     .clicked() {
-                        self.db_api.get_friends_list(self.current_user.id.to_string().as_str()); // Get friends list for the current user
+                        self.db_api.get_friends_list(self.current_user.id); // Get friends list for the current user
                         self.db_api.get_user_list();                        
                         self.current_page = "friends".to_string();
 

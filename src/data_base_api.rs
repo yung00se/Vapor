@@ -6,7 +6,7 @@ use tokio;
 pub trait MakeRequest {
     fn get_login(&self, username: &str);
     fn get_user_list(&self);
-    fn get_friends_list(&self, user_id: &str);
+    fn get_friends_list(&self, user_id: i32);
     fn get_leaderboard(&self);
     fn get_user_stats(&self, user_id: &str);
     fn post_signup(&self, username: &str, password: &str);
@@ -114,7 +114,7 @@ impl MakeRequest for DbAPI{
         });
     }
 
-    fn get_friends_list(&self, user_id: &str) {
+    fn get_friends_list(&self, user_id: i32) {
         let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api".to_string();
         let end = format!("/Friend/GetAllFriends/{}", user_id);
         let url = api_url + &end;

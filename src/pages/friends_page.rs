@@ -1,3 +1,6 @@
+use std::thread::sleep;
+use std::time::Duration;
+
 use eframe::egui::{self, Color32, FontId, Sense, SidePanel, Key, TextEdit};
 use eframe::emath::Vec2;
 use emath::Align2;
@@ -35,6 +38,8 @@ impl DisplayFriends for Vapor {
                 egui::popup::popup_above_or_below_widget(ui, popup_id, &user_button, above, close_on_unfocus, |ui|{
                     if ui.add(egui::Button::new("Add Friend")).clicked() {
                         self.db_api.add_friend(self.current_user.id, &user.Username);
+                        sleep(Duration::from_millis(250));
+                        self.db_api.get_friends_list(self.current_user.id);
                     }
                 });
 

@@ -1,12 +1,12 @@
 use eframe::{egui::{self, Color32, FontId, Pos2, Rect, Rounding, Sense, Shape, Stroke, Vec2},
              epaint::RectShape};
 use walkdir::WalkDir;
-use std::{env, path::PathBuf, process::{Command, Stdio}, thread};
+use std::{any::Any, env, path::PathBuf, process::{Command, Stdio}, thread};
 use std::io::{Read, Write, BufRead, BufReader};
 use std::fs;
 
 //use crate::user_info::User;
-use crate::vapor::Vapor;
+use crate::{data_base_api::DbAPI, vapor::Vapor};
 
 #[derive(Clone)]
 pub struct GameIcon {
@@ -25,13 +25,16 @@ impl Default for GameIcon {
 }
 
 impl GameIcon{
-    pub fn run_game(&self) {
+    pub fn run_game(&self, user_id: i32, db_api: &DbAPI) {
         let mut game_instance = 
             Command::new(&self.path)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()
             .expect("Game not found in Vapor Path...");
+
+        let player_id = user_id.clone();
+        let api_clone = db_api.clone();
         thread::spawn(move || {
             if let Some(game_output) = &mut game_instance.stdout {
                 let lines = BufReader::new(game_output).lines().enumerate().take(64);
@@ -51,7 +54,7 @@ impl GameIcon{
                     }
                 }
             }
-        });
+        }); // End thread
     }
 
     fn generate_icon_rect(&mut self){
@@ -86,7 +89,7 @@ impl DisplayLibrary for Vapor {
                     FontId::default(),
                     Color32::WHITE,
                 );
-                if response.clicked() { game.run_game() } 
+                if response.clicked() { game.run_game(self.current_user.id, &self.db_api) } 
             }
         });
     }

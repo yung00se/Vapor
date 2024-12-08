@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use eframe::{App, Frame,
              egui::{self, Label, RichText, Sense, TextEdit, TextStyle, Align, TopBottomPanel, CentralPanel, Color32, Key, Button}};
-use crate::data_base_api::{DbAPI, MakeRequest};
+use crate::{data_base_api::{DbAPI, MakeRequest}, pages::leaderboard_page::Leaderboard};
 use crate::user_info::User;
 use crate::pages::{navigator::NavBar, game_hub::{DisplayLibrary, GameIcon, build_library}, friends_page::DisplayFriends, leaderboard_page::DisplayLeaderboard};
 
@@ -12,6 +12,7 @@ pub struct Vapor {
     pub current_page: String,
     pub game_library: Vec<GameIcon>,
     pub add_friend_input: String,
+    pub leaderboard: Leaderboard,
 }
 
 impl Default for Vapor{
@@ -22,6 +23,7 @@ impl Default for Vapor{
             current_page: "login".to_string(),
             game_library: build_library(),
             add_friend_input: "".to_string(),
+            leaderboard: Leaderboard::default(),
         }
     }
 }

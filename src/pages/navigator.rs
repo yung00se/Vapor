@@ -37,8 +37,6 @@ impl NavBar for Vapor{
                         self.current_page ="leaderboards".to_string();
                         // Make get call here
                         self.db_api.get_leaderboard();
-
-                        // let first_user= db_api.leaderboard.lock().unwrap().pop();
                 }/*End Page Directory*/});
         });
     }

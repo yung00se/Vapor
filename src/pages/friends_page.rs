@@ -36,6 +36,14 @@ impl DisplayFriends for Vapor {
                 let close_on_unfocus = egui::popup::PopupCloseBehavior::CloseOnClickOutside;
 
                 egui::popup::popup_above_or_below_widget(ui, popup_id, &user_button, above, close_on_unfocus, |ui|{
+                    // put user's stats here
+                    ui.heading(format!("High Scores for {}", user.Username));
+                    ui.horizontal(|ui| {
+                        ui.add_space(20.0);
+                        ui.label(format!("Word Scramble: {}", user.HighScore));
+                    });
+                    // need to add scores for sudoku and other games here
+                    ui.add_space(15.0);
                     if ui.add(egui::Button::new("Add Friend")).clicked() {
                         self.db_api.add_friend(self.current_user.id, &user.Username);
                         sleep(Duration::from_millis(250));

@@ -40,7 +40,7 @@ impl DisplayFriends for Vapor {
                     ui.heading(format!("High Scores for {}", user.Username));
                     ui.horizontal(|ui| {
                         ui.add_space(20.0);
-                        ui.label(format!("Word Scramble: {}", user.HighScore));
+                        ui.label(format!("Word Scramble: {}", user.HighScoreWord));
                     });
                     // need to add scores for sudoku and other games here
                     ui.add_space(15.0);

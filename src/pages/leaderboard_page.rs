@@ -66,7 +66,7 @@ impl Leaderboard {
                             if index > 9 {
                                 break
                             }
-                            ui.label(user.HighScore.to_string());
+                            ui.label(user.HighScoreWord.to_string());
                             ui.add_space(10.0);
                             index += 1;
                         }
@@ -159,7 +159,7 @@ impl DisplayLeaderboard for Vapor {
                             if index > 9 {
                                 break
                             }
-                            ui.label(user.HighScore.to_string());
+                            ui.label(user.HighScoreWord.to_string());
                             ui.add_space(10.0);
                             index += 1;
                         }

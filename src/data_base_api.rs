@@ -27,7 +27,9 @@ pub struct UserEntry {
     pub UserID: i32,
     pub Username: String,
     pub Password: String,
-    pub HighScore: i32,
+    pub HighScoreWord: i32,
+    pub HighScoreSudoku: i32,
+    pub HighScoreMath: i32,
 }
 
 impl Default for UserEntry {
@@ -36,7 +38,9 @@ impl Default for UserEntry {
             UserID: -1,
             Username: "".to_string(),
             Password: "".to_string(),
-            HighScore: 0,
+            HighScoreWord: 0,
+            HighScoreSudoku: 0,
+            HighScoreMath: 0,
         }
     }
 }
@@ -47,7 +51,9 @@ impl UserEntry {
             UserID: id,
             Username: name,
             Password: pass,
-            HighScore: score,
+            HighScoreWord: score,
+            HighScoreSudoku: 0,
+            HighScoreMath: 0,
         }
     }
 }

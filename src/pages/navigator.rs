@@ -37,7 +37,16 @@ impl NavBar for Vapor{
                         self.current_page ="leaderboards".to_string();
                         // Make get call here
                         self.db_api.get_leaderboard();
-                }/*End Page Directory*/});
+                }/*End Page Directory*/
+                
+                ui.add_space(75.0);
+
+                if ui 
+                    .add(Label::new("Settings").sense(Sense::click()))
+                    .clicked() {
+                        self.current_page = "settings".to_string();
+                }
+            });
         });
     }
 

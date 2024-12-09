@@ -15,7 +15,10 @@ pub struct Vapor {
     pub add_friend_input: String,
     pub leaderboard: Leaderboard,
     pub chat: Chat,
+    pub new_username: String,
+    pub new_password: String,
 }
+
 
 impl Default for Vapor{
     fn default() -> Self{
@@ -27,6 +30,8 @@ impl Default for Vapor{
             add_friend_input: "".to_string(),
             leaderboard: Leaderboard::default(),
             chat: Chat::new(),
+            new_username: "".to_string(),
+            new_password: "".to_string(),
         }
     }
 }
@@ -155,6 +160,28 @@ impl Vapor {
         });
     }
 
+    fn display_settings(&mut self, ctx: &egui::Context) {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("Account Settings");
+
+            // Change Username
+            ui.label("Change Username:");
+            ui.add(TextEdit::singleline(&mut self.new_username).hint_text("Enter a new Username...")
+                       .desired_width(200.0)
+                       .horizontal_align(Align::Center));
+            if ui.button("Update Username").clicked() {
+                self.current_user.name = self.new_username.clone();
+                self.db_api.change_username(self.current_user.id, &self.new_username);
+            }
+
+            // Change Password
+            ui.label("Change Password:");
+            ui.add(TextEdit::singleline(&mut self.new_password).password(true).hint_text("Enter new password..."));
+            if ui.button("Update Password").clicked() {
+                self.db_api.change_password(self.current_user.id, &self.new_password);
+            }
+        });
+    }
     fn request_login(&mut self){
         self.db_api.get_login(self.current_user.name.as_str());
     }
@@ -171,6 +198,8 @@ impl Vapor {
         else if self.current_page == "leaderboards" {self.display_leaderboard(ctx);}
         else if self.current_page == "login" {self.display_login(ctx)}
         else if self.current_page == "signup" {self.display_signup(ctx)}
+        else if self.current_page == "settings" {self.display_settings(ctx)}
+
     }
 
 } //End Vapor Implementation

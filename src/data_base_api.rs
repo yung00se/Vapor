@@ -11,6 +11,8 @@ pub trait MakeRequest {
     fn get_user_stats(&self, user_id: &str);
     fn post_signup(&self, username: &str, password: &str);
     fn add_friend(&self, username: i32, friend: &str);
+    fn change_password(&self, user_id: i32, new_password: &str);
+    fn change_username(&self, user_id: i32, new_username: &str);
 }
 
 /* 
@@ -242,6 +244,43 @@ impl MakeRequest for DbAPI{
             match response {
                 Ok(_) => {*update_notifier.lock().unwrap() = true},
                 Err(e) => eprint!("Error sending friend request: {e}"),
+            }
+        });
+    }
+
+    fn change_password(&self, user_id: i32, new_password: &str) {
+        eprint!("{}, {}\n", user_id, new_password);
+        let api_url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/".to_string();
+        let end = format!("User/ChangePassword?UserID={}&NewPassword={}", user_id, new_password);
+        let url = api_url + &end;
+        eprint!("{}\n", url);
+        let client_clone = self.client.clone();
+        tokio::spawn(async move{
+            eprint!("inside change password\n");
+            eprint!("{}\n", url);
+            let response = client_clone.put(url).body("").send().await;
+            match response {
+                Ok(_) => {eprint!("password changed");},
+                Err(e) => eprint!("Error changing password: {e}"),
+            }
+        });
+    }
+
+    fn change_username(&self, user_id: i32, new_username: &str) {
+        let url = format!("https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/ChangeUsername?UserID={}&NewUsername={}", user_id, new_username);
+        let client_clone = self.client.clone();
+        let new_username = new_username.to_string();
+        tokio::spawn(async move {
+            let response = client_clone.put(url).body("").send().await;
+            match response {
+                Ok(resp) => {
+                    if resp.status().is_success() {
+                        println!("Username successfully changed to '{}'", new_username);
+                    } else {
+                        eprintln!("Failed to change username: {}", resp.status());
+                    }
+                }
+                Err(e) => eprintln!("Error changing username: {}", e),
             }
         });
     }

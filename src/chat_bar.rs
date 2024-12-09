@@ -7,7 +7,7 @@ use std::{env, io::{BufRead, BufReader, Write}, process::{Child, ChildStdin, Chi
 use std::net::TcpStream;
 use std::io::prelude::Read;
 
-const SERVER_ADDR: &str = "192.168.56.1:6001";
+const SERVER_ADDR: &str = "99.191.69.13:6001";
 
 pub struct Chat{
     pub username: String,
@@ -29,9 +29,8 @@ impl Chat{
     }
 
     pub fn start_client(&mut self) {
-        let read_stream = Arc::new(Mutex::new(TcpStream::connect(SERVER_ADDR).unwrap()));
+        let read_stream = Arc::new(Mutex::new(TcpStream::connect(SERVER_ADDR).expect("Failed to connect to server")));
         let read_stream_clone = Arc::clone(&read_stream);
-        //let read_buffer_clone = Arc::clone(&self.read_buffer);
         let message_list_clone = Arc::clone(&self.message_list);
 
         self.write_stream
@@ -40,11 +39,16 @@ impl Chat{
         
         // reader thread
         std::thread::spawn(move || {
-            let mut stream_clone = read_stream_clone.lock().unwrap();
-            let reader = BufReader::new(stream_clone);
+            let mut stream = read_stream_clone.lock().unwrap();
+            let reader = BufReader::new(&mut *stream);
 
-            for line in reader.lines() {
-                message_list_clone.lock().unwrap().push(line.expect("Failed to push to message list"));
+            for line_result in reader.lines() {
+                let line = line_result.expect("Failed to read from stream");
+
+                message_list_clone
+                    .lock()
+                    .unwrap()
+                    .push(line);
             }
         });
     }

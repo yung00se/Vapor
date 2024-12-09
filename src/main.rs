@@ -9,6 +9,6 @@ async fn main() {
     let _ = eframe::run_native( // Start Vapor
         "Word Unscrambler", // Set the app title
         native_options, 
-        Box::new(|_cc| Ok(Box::new(Vapor::default()))),
+        Box::new(|cc| Ok(Box::new(Vapor::new(cc)))),
     );
 }

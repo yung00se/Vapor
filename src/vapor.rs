@@ -56,6 +56,17 @@ impl App for Vapor {
 
 
 impl Vapor {
+    pub fn new(cc: &eframe::CreationContext) -> Self{
+        let ctx = &cc.egui_ctx;
+        let mut style = (*ctx.style()).clone();
+        style.visuals.window_fill = egui::Color32::from_rgb(92, 30, 38);
+        style.visuals.extreme_bg_color = egui::Color32::from_rgb(56, 18, 23);
+        style.visuals.override_text_color = Some(egui::Color32::from_rgb(252, 251, 182));
+        
+        ctx.set_style(style);
+
+        Self::default()
+    }
 
     fn display_landing(&mut self, ctx: &egui::Context){
         TopBottomPanel::top("login-or-signup").show(ctx, |ui| { //Login or  Signup Selection

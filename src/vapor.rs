@@ -19,6 +19,8 @@ pub struct Vapor {
 
 impl Default for Vapor{
     fn default() -> Self{
+        let mut chat = Chat::new();
+        chat.start_client("John".to_string());
         Self{
             current_user: User::new("".into(), "".into(), -1),
             db_api: DbAPI::new(),
@@ -26,7 +28,7 @@ impl Default for Vapor{
             game_library: build_library(),
             add_friend_input: "".to_string(),
             leaderboard: Leaderboard::default(),
-            chat: Chat::new(),
+            chat,
         }
     }
 }

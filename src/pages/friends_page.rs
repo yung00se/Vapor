@@ -18,19 +18,20 @@ impl DisplayFriends for Vapor {
         let user_list = self.db_api.user_list.lock().unwrap();
         egui::CentralPanel::default().show(ctx, |ui| {
             egui::ScrollArea::vertical().show(ui, |ui| {
+                ui.set_width(ui.available_width());
                 for user in user_list.iter() {
                     let (user_rect, user_button) = ui.allocate_exact_size(Vec2::new(300.0, 50.0), Sense::click());
                     let popup_id = ui.make_persistent_id(&user.UserID);
                     ui.painter().rect_filled(
                         user_rect,
                         0.0,
-                        Color32::from_rgb(248, 248, 248));
+                        Color32::from_rgb(56, 18, 23));
                     
                     ui.painter().text( user_rect.center(),
                                        egui::Align2::LEFT_CENTER,
                                        &user.Username, //+ format!("\t\t\tHigh Score: {}", friend.HighScore.to_string().as_str()).as_str(),
                                        FontId::default(),
-                                       Color32::from_rgb(40, 40, 40));
+                                       Color32::from_rgb(252, 251, 182));
 
                 let above = egui::AboveOrBelow::Above;
                 let close_on_unfocus = egui::popup::PopupCloseBehavior::CloseOnClickOutside;
@@ -69,13 +70,13 @@ impl DisplayFriends for Vapor {
                   ui.painter().rect_filled(
                       friend_rect,
                       0.0,
-                      Color32::from_rgb(248, 248, 248));
+                      Color32::from_rgb(56, 18, 23));
                   
                   ui.painter().text( friend_rect.center(),
                                      egui::Align2::LEFT_CENTER,
                                      &friend, //+ format!("\t\t\tHigh Score: {}", friend.HighScore.to_string().as_str()).as_str(),
                                      FontId::default(),
-                                     Color32::from_rgb(40, 40, 40));}
+                                     Color32::from_rgb(252, 251, 182));}
             });
     }
     fn add_friends(&mut self, ctx: &egui::Context){

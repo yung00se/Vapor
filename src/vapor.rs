@@ -51,10 +51,6 @@ impl App for Vapor {
     }
 }
 
-
-
-
-
 impl Vapor {
     pub fn new(cc: &eframe::CreationContext) -> Self{
         let ctx = &cc.egui_ctx;
@@ -62,7 +58,7 @@ impl Vapor {
         style.visuals.window_fill = egui::Color32::from_rgb(92, 30, 38);
         style.visuals.extreme_bg_color = egui::Color32::from_rgb(56, 18, 23);
         style.visuals.override_text_color = Some(egui::Color32::from_rgb(252, 251, 182));
-        
+        style.visuals.dark_mode = true;
         ctx.set_style(style);
 
         Self::default()

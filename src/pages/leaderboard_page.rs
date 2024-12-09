@@ -36,7 +36,7 @@ impl Leaderboard {
                     .clicked() { self.current_page = "Sudoku".into()  } /*End Login/Signup Buttons*/ });
         });
         let ws_leaderboard = &self.db_api.leaderboard.lock().unwrap();
-        let sudoku_leaderboard = [String::from("blah blah"), String::from("ding dong")].to_vec();
+        let sudoku_leaderboard = [].to_vec();
 
         egui::CentralPanel::default().show(ctx, |ui| {
             let mut index = 0;

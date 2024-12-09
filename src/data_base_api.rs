@@ -64,6 +64,8 @@ pub struct DbAPI {
     pub friends_list: Arc<Mutex<Vec<String>>>,
     pub user_list: Arc<Mutex<Vec<UserEntry>>>,
     pub leaderboard: Arc<Mutex<Vec<UserEntry>>>,
+    pub sudoku_leaderboard: Arc<Mutex<Vec<UserEntry>>>,
+    pub math_leaderboard: Arc<Mutex<Vec<UserEntry>>>,
     
     pub update_indicator: Arc<Mutex<bool>>,
 }
@@ -76,7 +78,8 @@ impl DbAPI {
             friends_list: Arc::new(Mutex::new(Vec::new())),
             user_list: Arc::new(Mutex::new(Vec::new())),
             leaderboard: Arc::new(Mutex::new(Vec::new())),
-            
+            sudoku_leaderboard: Arc::new(Mutex::new(Vec::new())),
+            math_leaderboard: Arc::new(Mutex::new(Vec::new())),
             update_indicator: Arc::new(Mutex::new(false)),
         }
     }
@@ -147,6 +150,40 @@ impl MakeRequest for DbAPI{
     fn get_leaderboard(&self) {
         let url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/GetScoresDescending".to_string();
         let leaderboard_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.leaderboard);
+        tokio::spawn(async move{
+            let response = reqwest::get(url).await;
+            match response {
+                Ok(resp) => {
+                    let response_body: Vec<UserEntry> = resp.json().await.expect("Error getting leaderboard");
+                    //let response_body: String = resp.text().await.expect("Error getting leaderboard");
+                    //eprint!("{}\n", response_body);
+                    *leaderboard_arc.lock().unwrap() = response_body;
+                },
+                Err(e) => {
+                    eprint!("{}", e);
+                }
+            }
+        });
+        
+        let url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/GetScoresDescendingSudoku".to_string();
+        let leaderboard_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.sudoku_leaderboard);
+        tokio::spawn(async move{
+            let response = reqwest::get(url).await;
+            match response {
+                Ok(resp) => {
+                    let response_body: Vec<UserEntry> = resp.json().await.expect("Error getting leaderboard");
+                    //let response_body: String = resp.text().await.expect("Error getting leaderboard");
+                    //eprint!("{}\n", response_body);
+                    *leaderboard_arc.lock().unwrap() = response_body;
+                },
+                Err(e) => {
+                    eprint!("{}", e);
+                }
+            }
+        });
+
+        let url = "https://word-unscrambler-api-ade3e9ard4huhmbh.canadacentral-01.azurewebsites.net/api/User/GetScoresDescendingMath".to_string();
+        let leaderboard_arc: Arc<Mutex<Vec<UserEntry>>> = Arc::clone(&self.math_leaderboard);
         tokio::spawn(async move{
             let response = reqwest::get(url).await;
             match response {

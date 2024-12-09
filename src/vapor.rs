@@ -51,10 +51,6 @@ impl App for Vapor {
     }
 }
 
-
-
-
-
 impl Vapor {
     pub fn new(cc: &eframe::CreationContext) -> Self{
         let ctx = &cc.egui_ctx;

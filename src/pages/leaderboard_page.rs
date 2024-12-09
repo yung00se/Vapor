@@ -36,7 +36,7 @@ impl Leaderboard {
                     .clicked() { self.current_page = "Sudoku".into()  } /*End Login/Signup Buttons*/ });
         });
         let ws_leaderboard = &self.db_api.leaderboard.lock().unwrap();
-        let sudoku_leaderboard = [].to_vec();
+        let s_leaderboard = &self.db_api.sudoku_leaderboard.lock().unwrap();
 
         egui::CentralPanel::default().show(ctx, |ui| {
             let mut index = 0;
@@ -73,40 +73,37 @@ impl Leaderboard {
                     });
                 });
             }
-            else {
+            else if self.current_page == "Sudoku".to_string(){
                 ui.horizontal(|ui| {
                     ui.add_space(200.0);
                     ui.vertical(|ui| {
                         ui.heading("User");
                         ui.add_space(10.0);
                         
-                        for user in sudoku_leaderboard.iter() {
+                        for user in s_leaderboard.iter() {
                             if index > 9 {
                                 break
                             }
-                            //ui.label(user.Username.clone());
-                            ui.label(user);
+                            ui.label(user.Username.clone());
                             ui.add_space(10.0);
                             index += 1;
                         }
                     });
 
-                    /*
                     ui.add_space(100.0);
                     ui.vertical(|ui| {
                         ui.heading("High Score");
                         ui.add_space(10.0);
                         index = 0;
-                        for user in sudoku_leaderboard.iter() {
+                        for user in s_leaderboard.iter() {
                             if index > 9 {
                                 break
                             }
-                            ui.label(user.HighScore.to_string());
+                            ui.label(user.HighScoreSudoku.to_string());
                             ui.add_space(10.0);
                             index += 1;
                         }
                     });
-                    */
                 });
             }
         });
@@ -129,7 +126,7 @@ impl DisplayLeaderboard for Vapor {
                     .clicked() { self.leaderboard.current_page = "Sudoku".into()  } /*End Login/Signup Buttons*/ });
         });
         let ws_leaderboard = &self.db_api.leaderboard.lock().unwrap();
-        let sudoku_leaderboard = [String::from("blah blah"), String::from("ding dong")].to_vec();
+        let s_leaderboard = &self.db_api.sudoku_leaderboard.lock().unwrap();
 
         egui::CentralPanel::default().show(ctx, |ui| {
             let mut index = 0;
@@ -166,40 +163,37 @@ impl DisplayLeaderboard for Vapor {
                     });
                 });
             }
-            else {
+            else if self.leaderboard.current_page == "Sudoku".to_string(){
                 ui.horizontal(|ui| {
                     ui.add_space(200.0);
                     ui.vertical(|ui| {
                         ui.heading("User");
                         ui.add_space(10.0);
                         
-                        for user in sudoku_leaderboard.iter() {
+                        for user in s_leaderboard.iter() {
                             if index > 9 {
                                 break
                             }
-                            //ui.label(user.Username.clone());
-                            ui.label(user);
+                            ui.label(user.Username.clone());
                             ui.add_space(10.0);
                             index += 1;
                         }
                     });
 
-                    /*
                     ui.add_space(100.0);
                     ui.vertical(|ui| {
                         ui.heading("High Score");
                         ui.add_space(10.0);
                         index = 0;
-                        for user in sudoku_leaderboard.iter() {
+                        for user in s_leaderboard.iter() {
                             if index > 9 {
                                 break
                             }
-                            ui.label(user.HighScore.to_string());
+                            ui.label(user.HighScoreSudoku.to_string());
                             ui.add_space(10.0);
                             index += 1;
                         }
                     });
-                    */
                 });
             }
         });

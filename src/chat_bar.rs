@@ -86,7 +86,7 @@ impl ChatBar for Chat {
 
                             let send_button = ui.add(Button::new("Send"));
                             if send_button.clicked(){
-                                self.write_stream.write_all(format!("{}\n",self.chat_input.clone()).as_bytes()).expect("Failed to send message to server");
+                                self.write_stream.write_all(format!("{}: {}\n", self.username.clone() ,self.chat_input.clone()).as_bytes()).expect("Failed to send message to server");
                                 self.chat_input = String::new();
                             }
                             

@@ -7,7 +7,7 @@ use std::{env, io::{BufRead, BufReader, Write}, process::{Child, ChildStdin, Chi
 use std::net::TcpStream;
 use std::io::prelude::Read;
 
-const SERVER_ADDR: &str = "99.191.69.13:6001";
+const SERVER_ADDR: &str = "127.0.0.1:8080";
 
 pub struct Chat{
     pub username: String,
@@ -19,23 +19,13 @@ pub struct Chat{
 
 impl Chat{
     pub fn new() -> Self{
-        Self{
-            username: "".into(),
-            chat_input: "".into(),
-            read_buffer: Arc::new(Mutex::new(Vec::new())),
-            message_list: Arc::new(Mutex::new(Vec::new())),
-            write_stream: TcpStream::connect(SERVER_ADDR).expect("Failed to connect to server"),
-        }
-    }
+        let write_stream = TcpStream::connect(SERVER_ADDR).expect("Failed to connect to server");
 
-    pub fn start_client(&mut self) {
         let read_stream = Arc::new(Mutex::new(TcpStream::connect(SERVER_ADDR).expect("Failed to connect to server")));
         let read_stream_clone = Arc::clone(&read_stream);
-        let message_list_clone = Arc::clone(&self.message_list);
 
-        self.write_stream
-            .write_all(self.username.as_bytes())
-            .expect("Failed to send username");
+        let message_list = Arc::new(Mutex::new(Vec::new()));
+        let message_list_clone = Arc::clone(&message_list);
         
         // reader thread
         std::thread::spawn(move || {
@@ -48,9 +38,16 @@ impl Chat{
                 message_list_clone
                     .lock()
                     .unwrap()
-                    .push(line);
-            }
-        });
+                    .push(String::from(line));
+            }});
+
+        Self{
+            username: "".into(),
+            chat_input: "".into(),
+            read_buffer: Arc::new(Mutex::new(Vec::new())),
+            message_list,
+            write_stream,
+        }
     }
 }
 
@@ -88,17 +85,14 @@ impl ChatBar for Chat {
                                    .hint_text("Type here..."));
 
                             let send_button = ui.add(Button::new("Send"));
-                            if send_button.clicked() {
-                                self.write_stream.write_all(self.chat_input.clone().as_bytes()).expect("Failed to send message to server");
+                            if send_button.clicked(){
+                                self.write_stream.write_all(format!("{}\n",self.chat_input.clone()).as_bytes()).expect("Failed to send message to server");
                                 self.chat_input = String::new();
                             }
                             
-                            let text_result = self.message_list.lock().unwrap().pop();
-                            match text_result {
-                                Some(text) => {
-                                    ui.label(text);
-                                },
-                                None => (),
+                            let messages_result = self.message_list.lock().unwrap();
+                            for message in messages_result.iter(){
+                                ui.label(message);
                             }
                         });//End text input
                 });//End bottom_up display area

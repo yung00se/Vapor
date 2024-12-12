@@ -44,7 +44,6 @@ impl App for Vapor {
         } else {
             if self.chat.username == "".to_string() {
                 self.chat.username = self.current_user.name.clone();
-                self.chat.start_client();
             }
             self.show_nav_bar(ctx);
             self.display_friends(ctx);
